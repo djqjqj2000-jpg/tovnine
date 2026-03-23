@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- saved from url=(0112)file:///C:/Users/USER/Downloads/%ED%86%A0%EB%B8%8C%EB%82%98%EC%9D%B8_%EC%98%88%EC%95%BD%EC%9E%A5%EB%B6%80_1.html -->
+<!-- saved from url=(0113)file:///C:/Users/USER/Downloads/%ED%86%A0%EB%B8%8C%EB%82%98%EC%9D%B8_%EC%98%88%EC%95%BD%EC%9E%A5%EB%B6%80_v2.html -->
 <html lang="ko"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -259,6 +259,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .btn-move-ok{font-size:13px;font-weight:600;padding:8px 20px;background:var(--t400);color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer;}
 .btn-move-cancel{font-size:12px;padding:8px 12px;background:transparent;color:var(--text2);border:0.5px solid var(--border);border-radius:var(--radius-md);cursor:pointer;}
 
+/* ── 이용완료 상태 ── */
+.res-item.st-done{background:var(--bg2);border-color:var(--border);opacity:0.6;}
+.qs-done{background:var(--t50);color:var(--t800);border:0.5px solid var(--t100);}
+.qs-done:hover{background:var(--t100);}
+
 /* ── 동기화 상태 ── */
 .sync-bar{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--text3);padding:4px 8px;background:var(--bg2);border-radius:var(--radius-md);}
 .sync-dot{width:6px;height:6px;border-radius:50%;background:var(--g400);flex-shrink:0;}
@@ -280,13 +285,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
   <div class="hdr">
     <div class="hdr-left">
       <h1>토브나인 예약장부</h1>
-      <p id="today-str">2026년 3월 23일 (월)</p>
+      <p id="today-str">2026년 3월 24일 (화)</p>
     </div>
     <div class="hdr-right">
       <div class="date-nav">
         <button class="date-arrow" onclick="moveDate(-1)">◀</button>
         <div class="date-center" onclick="toggleCal(event)">
-          <span class="date-main" id="date-main">3월 23일</span>
+          <span class="date-main" id="date-main">3월 24일</span>
           <span class="date-sub" id="date-sub">오늘</span>
         </div>
         <button class="date-arrow" onclick="moveDate(1)">▶</button>
@@ -313,14 +318,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
   <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
     <div class="sync-bar">
       <div class="sync-dot" id="sync-dot"></div>
-      <span id="sync-msg">마지막 동기화: 오전 12:59</span>
+      <span id="sync-msg">마지막 동기화: 오전 01:18</span>
     </div>
     <button style="font-size:11px;padding:4px 10px;border:0.5px solid var(--border);border-radius:20px;background:var(--bg);color:var(--text2);cursor:pointer;" onclick="loadData()">새로고침</button>
   </div>
 
   <div class="stats">
-    <div class="stat"><div class="stat-lbl">오늘 예약</div><div class="stat-val" id="s-tot">0</div><div class="stat-sub">건</div></div>
-    <div class="stat"><div class="stat-lbl">예약 인원</div><div class="stat-val" id="s-pax">0</div><div class="stat-sub">명</div></div>
+    <div class="stat"><div class="stat-lbl">오늘 예약</div><div class="stat-val" id="s-tot">12</div><div class="stat-sub">건</div></div>
+    <div class="stat"><div class="stat-lbl">예약 인원</div><div class="stat-val" id="s-pax">45</div><div class="stat-sub">명</div></div>
     <div class="stat"><div class="stat-lbl">잔여 테이블</div><div class="stat-val" id="s-avl">21</div><div class="stat-sub">/ 21개</div></div>
     <div class="stat"><div class="stat-lbl">합석</div><div class="stat-val" id="s-mrg">0</div><div class="stat-sub">건</div></div>
   </div>
@@ -353,7 +358,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
   <!-- 예약 목록 -->
   <div class="res-section">
     <div class="res-hdr">
-      <span class="res-ttl" id="res-ttl">오늘 예약 (0건)</span>
+      <span class="res-ttl" id="res-ttl">오늘 예약 (12건)</span>
       <button class="add-btn" onclick="openAdd()">+ 예약 추가</button>
     </div>
     <div class="guide-row">
@@ -361,7 +366,127 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
       <span class="guide-chip">착석중 탭 → 착석 취소</span>
       <span class="guide-chip">이동 → 자리 이동</span>
     </div>
-    <div class="res-list" id="res-list"><div class="empty-msg">예약이 없습니다</div></div>
+    <div class="res-list" id="res-list"><div class="res-item no-table">
+      <div class="res-item-left">
+        <span class="res-time">10:30</span>
+        <span class="res-tbl unset">미배정</span>
+        <span class="res-name">양혜정</span>
+        <span class="res-pax">2명</span>
+        <span class="res-ch ch-n">네이버</span>
+        <span class="res-note">슈멤</span>
+      </div>
+      <div class="quick-status"><button class="qs-btn qs-arrive" onclick="quickArrive(&#39;r_1774240267545_mn24&#39;,event)">착석</button><button class="qs-btn qs-detail" onclick="openEdit(&#39;r_1774240267545_mn24&#39;,event)">상세</button></div>
+    </div><div class="res-item no-table">
+      <div class="res-item-left">
+        <span class="res-time">10:30</span>
+        <span class="res-tbl unset">미배정</span>
+        <span class="res-name">최영희</span>
+        <span class="res-pax">6명</span>
+        <span class="res-ch ch-n">네이버</span>
+        
+      </div>
+      <div class="quick-status"><button class="qs-btn qs-arrive" onclick="quickArrive(&#39;r_1774240626539_h4id&#39;,event)">착석</button><button class="qs-btn qs-detail" onclick="openEdit(&#39;r_1774240626539_h4id&#39;,event)">상세</button></div>
+    </div><div class="res-item no-table">
+      <div class="res-item-left">
+        <span class="res-time">11:00</span>
+        <span class="res-tbl unset">미배정</span>
+        <span class="res-name">유윤종</span>
+        <span class="res-pax">5명</span>
+        <span class="res-ch ch-n">네이버</span>
+        <span class="res-note">기도모임/조용한자리 룸원함(2층 11번으로)</span>
+      </div>
+      <div class="quick-status"><button class="qs-btn qs-arrive" onclick="quickArrive(&#39;r_1774240706232_ulda&#39;,event)">착석</button><button class="qs-btn qs-detail" onclick="openEdit(&#39;r_1774240706232_ulda&#39;,event)">상세</button></div>
+    </div><div class="res-item no-table">
+      <div class="res-item-left">
+        <span class="res-time">11:00</span>
+        <span class="res-tbl unset">미배정</span>
+        <span class="res-name">박수민</span>
+        <span class="res-pax">4명</span>
+        <span class="res-ch ch-n">네이버</span>
+        <span class="res-note">2번요청</span>
+      </div>
+      <div class="quick-status"><button class="qs-btn qs-arrive" onclick="quickArrive(&#39;r_1774240923504_cmf6&#39;,event)">착석</button><button class="qs-btn qs-detail" onclick="openEdit(&#39;r_1774240923504_cmf6&#39;,event)">상세</button></div>
+    </div><div class="res-item no-table">
+      <div class="res-item-left">
+        <span class="res-time">11:00</span>
+        <span class="res-tbl unset">미배정</span>
+        <span class="res-name">이윤지</span>
+        <span class="res-pax">3명</span>
+        <span class="res-ch ch-n">네이버</span>
+        
+      </div>
+      <div class="quick-status"><button class="qs-btn qs-arrive" onclick="quickArrive(&#39;r_1774242546297_ey4t&#39;,event)">착석</button><button class="qs-btn qs-detail" onclick="openEdit(&#39;r_1774242546297_ey4t&#39;,event)">상세</button></div>
+    </div><div class="res-item no-table">
+      <div class="res-item-left">
+        <span class="res-time">11:00</span>
+        <span class="res-tbl unset">미배정</span>
+        <span class="res-name">주한나</span>
+        <span class="res-pax">2명</span>
+        <span class="res-ch ch-n">네이버</span>
+        <span class="res-note">슈멤</span>
+      </div>
+      <div class="quick-status"><button class="qs-btn qs-arrive" onclick="quickArrive(&#39;r_1774242616980_ifws&#39;,event)">착석</button><button class="qs-btn qs-detail" onclick="openEdit(&#39;r_1774242616980_ifws&#39;,event)">상세</button></div>
+    </div><div class="res-item no-table">
+      <div class="res-item-left">
+        <span class="res-time">11:30</span>
+        <span class="res-tbl unset">미배정</span>
+        <span class="res-name">김예린</span>
+        <span class="res-pax">2명</span>
+        <span class="res-ch ch-n">네이버</span>
+        <span class="res-note">슈멤</span>
+      </div>
+      <div class="quick-status"><button class="qs-btn qs-arrive" onclick="quickArrive(&#39;r_1774242661024_i8oi&#39;,event)">착석</button><button class="qs-btn qs-detail" onclick="openEdit(&#39;r_1774242661024_i8oi&#39;,event)">상세</button></div>
+    </div><div class="res-item no-table">
+      <div class="res-item-left">
+        <span class="res-time">11:30</span>
+        <span class="res-tbl unset">미배정</span>
+        <span class="res-name">김예진</span>
+        <span class="res-pax">3명</span>
+        <span class="res-ch ch-n">네이버</span>
+        <span class="res-note">조용한 자리</span>
+      </div>
+      <div class="quick-status"><button class="qs-btn qs-arrive" onclick="quickArrive(&#39;r_1774265862109_6el2&#39;,event)">착석</button><button class="qs-btn qs-detail" onclick="openEdit(&#39;r_1774265862109_6el2&#39;,event)">상세</button></div>
+    </div><div class="res-item no-table">
+      <div class="res-item-left">
+        <span class="res-time">12:00</span>
+        <span class="res-tbl unset">미배정</span>
+        <span class="res-name">김혜진</span>
+        <span class="res-pax">3명</span>
+        <span class="res-ch ch-n">네이버</span>
+        
+      </div>
+      <div class="quick-status"><button class="qs-btn qs-arrive" onclick="quickArrive(&#39;r_1774242697315_m158&#39;,event)">착석</button><button class="qs-btn qs-detail" onclick="openEdit(&#39;r_1774242697315_m158&#39;,event)">상세</button></div>
+    </div><div class="res-item no-table">
+      <div class="res-item-left">
+        <span class="res-time">12:00</span>
+        <span class="res-tbl unset">미배정</span>
+        <span class="res-name">이지연</span>
+        <span class="res-pax">2명</span>
+        <span class="res-ch ch-n">네이버</span>
+        
+      </div>
+      <div class="quick-status"><button class="qs-btn qs-arrive" onclick="quickArrive(&#39;r_1774258601898_idv2&#39;,event)">착석</button><button class="qs-btn qs-detail" onclick="openEdit(&#39;r_1774258601898_idv2&#39;,event)">상세</button></div>
+    </div><div class="res-item no-table">
+      <div class="res-item-left">
+        <span class="res-time">19:00</span>
+        <span class="res-tbl unset">미배정</span>
+        <span class="res-name">한윤영</span>
+        <span class="res-pax">6명</span>
+        <span class="res-ch ch-n">네이버</span>
+        <span class="res-note">2번자리</span>
+      </div>
+      <div class="quick-status"><button class="qs-btn qs-arrive" onclick="quickArrive(&#39;r_1774258636374_7zr6&#39;,event)">착석</button><button class="qs-btn qs-detail" onclick="openEdit(&#39;r_1774258636374_7zr6&#39;,event)">상세</button></div>
+    </div><div class="res-item no-table">
+      <div class="res-item-left">
+        <span class="res-time">19:00</span>
+        <span class="res-tbl unset">미배정</span>
+        <span class="res-name">안혜성</span>
+        <span class="res-pax">7명</span>
+        <span class="res-ch ch-n">네이버</span>
+        
+      </div>
+      <div class="quick-status"><button class="qs-btn qs-arrive" onclick="quickArrive(&#39;r_1774258661560_rbwe&#39;,event)">착석</button><button class="qs-btn qs-detail" onclick="openEdit(&#39;r_1774258661560_rbwe&#39;,event)">상세</button></div>
+    </div></div>
   </div>
 
 </div><!-- .app -->
@@ -473,25 +598,50 @@ async function loadData(){
   }
 }
 
+/* ★ 낙관적 업데이트: 화면 즉시 반영 → 백그라운드에서 시트 저장 */
 async function apiAdd(resData){
-  showLoading('예약 저장 중...');
+  // 1) 임시 id로 화면에 즉시 추가
+  const tempId='temp_'+Date.now();
+  resData.id=tempId;
+  RES.push({...resData});
+  render(); // 즉시 화면 반영
+  setSyncStatus('syncing','저장 중...');
   try{
+    // 2) 백그라운드에서 실제 저장
     const result=await apiCall({action:'add',data:JSON.stringify(resData)});
-    resData.id=result.id;
-    RES.push(resData);
+    // 3) 임시 id → 실제 id로 교체
+    const idx=RES.findIndex(r=>r.id===tempId);
+    if(idx>=0)RES[idx].id=result.id;
     setSyncStatus('ok',`마지막 동기화: ${new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})}`);
     return result;
-  }finally{hideLoading();}
+  }catch(err){
+    // 실패 시 롤백
+    const idx=RES.findIndex(r=>r.id===tempId);
+    if(idx>=0)RES.splice(idx,1);
+    render();
+    setSyncStatus('error','저장 실패 — 다시 시도해 주세요');
+    throw err;
+  }
 }
 
 async function apiUpdate(resData){
-  showLoading('수정 저장 중...');
+  // 1) 화면 즉시 반영
+  const idx=RES.findIndex(r=>r.id===resData.id);
+  const backup=idx>=0?{...RES[idx]}:null;
+  if(idx>=0)RES[idx]={...resData};
+  render();
+  setSyncStatus('syncing','저장 중...');
   try{
+    // 2) 백그라운드에서 실제 저장
     await apiCall({action:'update',data:JSON.stringify(resData)});
-    const idx=RES.findIndex(r=>r.id===resData.id);
-    if(idx>=0)RES[idx]={...resData};
     setSyncStatus('ok',`마지막 동기화: ${new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})}`);
-  }finally{hideLoading();}
+  }catch(err){
+    // 실패 시 롤백
+    if(backup&&idx>=0)RES[idx]=backup;
+    render();
+    setSyncStatus('error','저장 실패 — 다시 시도해 주세요');
+    throw err;
+  }
 }
 
 async function apiUpdateField(id, fields){
@@ -552,7 +702,8 @@ function fRes(){
     return true;
   });
 }
-function getAllForDate(dk){return RES.filter(r=>r.st!=='cancelled'&&r.date===dk);}
+// 배치도용: 이용완료(done)는 빈 테이블로 처리
+function getAllForDate(dk){return RES.filter(r=>r.st!=='cancelled'&&r.st!=='done'&&r.date===dk);}
 function getTotalCap(tbls){return tbls.reduce((s,n)=>s+(CAPS[n]||0),0);}
 
 /* ── 테이블 카드 정보 ── */
@@ -664,10 +815,17 @@ function renderList(){
     const tbl=noTbl?'미배정':r.tables.join('+')+(r.floor===1?' ¹':' ²');
     const isHl=hlResId===r.id;
     let qs='';
-    if(r.st==='confirmed')qs=`<button class="qs-btn qs-arrive" onclick="quickArrive('${r.id}',event)">착석</button>`;
-    else if(r.st==='arrived'){qs=`<button class="qs-btn qs-occupied" onclick="cancelArrive('${r.id}',event)">착석중 ✕</button>`;if(!noTbl)qs+=`<button class="qs-btn qs-move" onclick="openMoveSheet('${r.id}',event)">이동</button>`;}
+    if(r.st==='confirmed'){
+      qs=`<button class="qs-btn qs-arrive" onclick="quickArrive('${r.id}',event)">착석</button>`;
+    } else if(r.st==='arrived'){
+      qs=`<button class="qs-btn qs-occupied" onclick="cancelArrive('${r.id}',event)">착석중 ✕</button>`;
+      qs+=`<button class="qs-btn qs-done" onclick="quickDone('${r.id}',event)">완료</button>`;
+      if(!noTbl)qs+=`<button class="qs-btn qs-move" onclick="openMoveSheet('${r.id}',event)">이동</button>`;
+    } else if(r.st==='done'){
+      qs=`<span class="qs-btn" style="background:var(--bg2);color:var(--text3);cursor:default;border:0.5px solid var(--border);">이용완료</span>`;
+    }
     qs+=`<button class="qs-btn qs-detail" onclick="openEdit('${r.id}',event)">상세</button>`;
-    return `<div class="res-item${r.st==='arrived'?' st-arrived':''}${isHl?' hl-row':''}${noTbl?' no-table':''}">
+    return `<div class="res-item${r.st==='arrived'?' st-arrived':r.st==='done'?' st-done':''}${isHl?' hl-row':''}${noTbl?' no-table':''}">
       <div class="res-item-left">
         <span class="res-time">${r.time}</span>
         <span class="res-tbl${r.merged?' mp':''}${noTbl?' unset':''}">${tbl}</span>
@@ -682,19 +840,28 @@ function renderList(){
 }
 function render(){renderStats();renderDashFP();renderList();}
 
-/* ── 착석/취소 ── */
+/* ── 착석/취소/이용완료 ── */
 async function quickArrive(id,e){
   e.stopPropagation();
   const r=RES.find(x=>x.id===id);if(!r)return;
-  try{await apiUpdateField(id,{st:'arrived'});showToast(`${r.name} 착석 처리 완료`);render();}
+  try{await apiUpdateField(id,{st:'arrived'});showToast(`${r.name} 착석 처리 완료`);}
   catch(err){showToast('⚠ 처리 실패: '+err.message);}
 }
 async function cancelArrive(id,e){
   e.stopPropagation();
   const r=RES.find(x=>x.id===id);if(!r)return;
   if(!confirm(`${r.name} 고객의 착석을 취소하고 예약확정으로 되돌릴까요?`))return;
-  try{await apiUpdateField(id,{st:'confirmed'});showToast(`${r.name} 착석 취소 — 예약확정으로 변경`);render();}
+  try{await apiUpdateField(id,{st:'confirmed'});showToast(`${r.name} 착석 취소 — 예약확정으로 변경`);}
   catch(err){showToast('⚠ 처리 실패: '+err.message);}
+}
+/* ★ 이용완료 — 배치도에서 즉시 사라짐 */
+async function quickDone(id,e){
+  e.stopPropagation();
+  const r=RES.find(x=>x.id===id);if(!r)return;
+  try{
+    await apiUpdateField(id,{st:'done'});
+    showToast(`${r.name} 이용완료 — 테이블 비워짐`);
+  }catch(err){showToast('⚠ 처리 실패: '+err.message);}
 }
 
 /* ── 자리 이동 ── */
@@ -731,7 +898,7 @@ async function confirmMove(){
   try{
     await apiUpdateField(moveResId,{tables:[moveTargetTbl],floor:T1.includes(moveTargetTbl)?1:2,merged:false});
     showToast(`${r.name} ${old}번 → ${moveTargetTbl}번 이동 완료`);
-    closeMoveSheet();render();
+    closeMoveSheet();
   }catch(err){showToast('⚠ 처리 실패: '+err.message);}
 }
 
@@ -771,11 +938,12 @@ async function saveQuick(){
   const n=document.getElementById('q-name');if(n)qName=n.value.trim();
   if(!qName||!qDate||!qTime){alert('필수 항목을 입력해 주세요.');return;}
   const newRes={date:qDate,time:qTime,name:qName,phone:qPhone,pax:qPax,tables:[],floor:1,ch:qCh,note:qNote,st:'confirmed',merged:false};
+  // 즉시 닫고 화면 반영 (낙관적)
+  document.getElementById('modal-overlay').classList.remove('show');
+  qName='';qPax=2;qTime='';qPhone='';qNote='';qOptOpen=false;
+  showToast(`${newRes.name} 예약 추가 완료`);
   try{
-    await apiAdd(newRes);
-    showToast(`${getDateLabel(qDate)} ${qTime} ${qName} 예약 추가 완료`);
-    qName='';qPax=2;qTime='';qPhone='';qNote='';qOptOpen=false;
-    document.getElementById('modal-overlay').classList.remove('show');render();
+    await apiAdd(newRes); // 백그라운드 저장
   }catch(err){showToast('⚠ 저장 실패: '+err.message);}
 }
 
@@ -795,7 +963,7 @@ function buildDetailForm(){
     <div><div class="section-lbl">테이블 <span style="font-size:10px;color:var(--text3)">— 선택사항, 2개 이상 선택 시 합석</span></div><div class="fp-floor-tabs"><button class="fp-tab${initFloor===1?' active':''}" onclick="renderModalFP(1)">1층</button><button class="fp-tab${initFloor===2?' active':''}" onclick="renderModalFP(2)">2층</button></div><div class="fp-canvas modal-canvas" id="modal-fp-canvas"></div>${conflictLegend}<div class="fp-summary" id="fp-summary">${sumTxt}</div></div>
     <div class="cap-warn${over?' show':''}" id="cap-warn">${over?`⚠ 최대 수용 ${cap}명 초과 — 고객 요청 시 저장 가능합니다.`:''}</div>
     <div><div class="section-lbl">채널</div><div class="opt-row"><span class="opt${d.ch==='naver'?' sel-naver':''}" onclick="draft.ch='naver';refreshDOpts()">네이버</span><span class="opt${d.ch==='phone'?' sel-phone':''}" onclick="draft.ch='phone';refreshDOpts()">전화</span></div></div>
-    <div><div class="section-lbl">상태</div><div class="opt-row"><span class="opt${d.st==='confirmed'?' sel-confirmed':''}" onclick="draft.st='confirmed';refreshDOpts()">예약확정</span><span class="opt${d.st==='arrived'?' sel-arrived':''}" onclick="draft.st='arrived';refreshDOpts()">착석중</span><span class="opt${d.st==='cancelled'?' sel-cancelled':''}" onclick="draft.st='cancelled';refreshDOpts()">취소</span></div></div>
+    <div><div class="section-lbl">상태</div><div class="opt-row"><span class="opt${d.st==='confirmed'?' sel-confirmed':''}" onclick="draft.st='confirmed';refreshDOpts()">예약확정</span><span class="opt${d.st==='arrived'?' sel-arrived':''}" onclick="draft.st='arrived';refreshDOpts()">착석중</span><span class="opt${d.st==='done'?' sel-confirmed':''}" style="${d.st==='done'?'background:var(--t50);color:var(--t800);border-color:var(--t100)':''}" onclick="draft.st='done';refreshDOpts()">이용완료</span><span class="opt${d.st==='cancelled'?' sel-cancelled':''}" onclick="draft.st='cancelled';refreshDOpts()">취소</span></div></div>
     <div class="field"><label>요청사항 / 메모</label><textarea oninput="draft.note=this.value" placeholder="생일, 알레르기, 유아 동반 등">${d.note||''}</textarea></div>
   </div>`;
 }
@@ -847,18 +1015,21 @@ async function saveDetail(){
   const fn=document.getElementById('fn'),fx=document.getElementById('fx'),fp2=document.getElementById('fp2'),ta=document.querySelector('#dfi textarea');
   if(fn)draft.name=fn.value.trim();if(fx)draft.pax=parseInt(fx.value)||0;if(fp2)draft.phone=fp2.value.trim();if(ta)draft.note=ta.value.trim();
   if(!draft.name||!draft.pax){alert('필수 항목을 입력해 주세요.');return;}
+  // 즉시 닫고 화면 반영
+  document.getElementById('modal-overlay').classList.remove('show');
+  showToast(origId===null?`${draft.name} 예약 추가 완료`:`${draft.name} 수정 완료`);
   try{
-    if(origId===null){await apiAdd({...draft});showToast(`${draft.name} 예약 추가 완료`);}
-    else{await apiUpdate({...draft});showToast(`${draft.name} 수정 완료`);}
-    document.getElementById('modal-overlay').classList.remove('show');origId=null;render();
-  }catch(err){showToast('⚠ 저장 실패: '+err.message);}
+    if(origId===null){await apiAdd({...draft});}
+    else{await apiUpdate({...draft});}
+    origId=null;
+  }catch(err){showToast('⚠ 저장 실패: '+err.message);origId=null;}
 }
 async function cancelRes(){
   if(!confirm(`${draft.name} 고객의 예약을 취소하시겠습니까?`))return;
   try{
     await apiUpdateField(origId,{st:'cancelled'});
     showToast(`${draft.name} 예약 취소 처리`);
-    document.getElementById('modal-overlay').classList.remove('show');origId=null;render();
+    document.getElementById('modal-overlay').classList.remove('show');origId=null;
   }catch(err){showToast('⚠ 처리 실패: '+err.message);}
 }
 
