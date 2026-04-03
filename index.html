@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<!-- saved from url=(0113)file:///C:/Users/USER/Downloads/%ED%86%A0%EB%B8%8C%EB%82%98%EC%9D%B8_%EC%98%88%EC%95%BD%EC%9E%A5%EB%B6%80_v2.html -->
-<html lang="ko"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>토브나인 예약장부</title>
 <style>
@@ -285,19 +285,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
   <div class="hdr">
     <div class="hdr-left">
       <h1>토브나인 예약장부</h1>
-      <p id="today-str">2026년 3월 24일 (화)</p>
+      <p id="today-str"></p>
     </div>
     <div class="hdr-right">
       <div class="date-nav">
         <button class="date-arrow" onclick="moveDate(-1)">◀</button>
         <div class="date-center" onclick="toggleCal(event)">
-          <span class="date-main" id="date-main">3월 24일</span>
-          <span class="date-sub" id="date-sub">오늘</span>
+          <span class="date-main" id="date-main"></span>
+          <span class="date-sub" id="date-sub"></span>
         </div>
         <button class="date-arrow" onclick="moveDate(1)">▶</button>
       </div>
-      <button class="today-btn" id="today-btn" onclick="goToday()" style="display: none;">오늘로</button>
-      <span class="sess-badge" id="sess-badge">영업 시작 전</span>
+      <button class="today-btn" id="today-btn" onclick="goToday()">오늘로</button>
+      <span class="sess-badge" id="sess-badge"></span>
     </div>
   </div>
 
@@ -318,33 +318,33 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
   <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
     <div class="sync-bar">
       <div class="sync-dot" id="sync-dot"></div>
-      <span id="sync-msg">마지막 동기화: 오전 01:18</span>
+      <span id="sync-msg">데이터 연결 중...</span>
     </div>
     <button style="font-size:11px;padding:4px 10px;border:0.5px solid var(--border);border-radius:20px;background:var(--bg);color:var(--text2);cursor:pointer;" onclick="loadData()">새로고침</button>
   </div>
 
   <div class="stats">
-    <div class="stat"><div class="stat-lbl">오늘 예약</div><div class="stat-val" id="s-tot">12</div><div class="stat-sub">건</div></div>
-    <div class="stat"><div class="stat-lbl">예약 인원</div><div class="stat-val" id="s-pax">45</div><div class="stat-sub">명</div></div>
-    <div class="stat"><div class="stat-lbl">잔여 테이블</div><div class="stat-val" id="s-avl">21</div><div class="stat-sub">/ 21개</div></div>
-    <div class="stat"><div class="stat-lbl">합석</div><div class="stat-val" id="s-mrg">0</div><div class="stat-sub">건</div></div>
+    <div class="stat"><div class="stat-lbl">오늘 예약</div><div class="stat-val" id="s-tot">-</div><div class="stat-sub">건</div></div>
+    <div class="stat"><div class="stat-lbl">예약 인원</div><div class="stat-val" id="s-pax">-</div><div class="stat-sub">명</div></div>
+    <div class="stat"><div class="stat-lbl">잔여 테이블</div><div class="stat-val" id="s-avl">-</div><div class="stat-sub">/ 21개</div></div>
+    <div class="stat"><div class="stat-lbl">합석</div><div class="stat-val" id="s-mrg">-</div><div class="stat-sub">건</div></div>
   </div>
 
   <div class="toolbar">
-    <button class="s-tab active" onclick="setSess(&#39;all&#39;)">전체</button>
-    <button class="s-tab" onclick="setSess(&#39;lunch&#39;)">런치</button>
-    <button class="s-tab" onclick="setSess(&#39;dinner&#39;)">디너</button>
+    <button class="s-tab active" onclick="setSess('all')">전체</button>
+    <button class="s-tab" onclick="setSess('lunch')">런치</button>
+    <button class="s-tab" onclick="setSess('dinner')">디너</button>
   </div>
 
   <!-- 배치도 -->
   <div class="floors-wrap">
     <div class="floor-box">
-      <div class="floor-hdr"><span class="floor-ttl">1층</span><span class="floor-sum" id="d-f1-sum">빈자리 10/10</span></div>
-      <div class="fp-canvas" id="d-fp-1f"><div class="fp-entrance">입구</div><div class="fp-tbl fp-available" style="left: 83%; top: 5%; width: 15%; height: 28%;"><div class="fp-tbl-num">2</div></div><div class="fp-tbl fp-available" style="left: 69%; top: 5%; width: 13%; height: 28%;"><div class="fp-tbl-num">3</div></div><div class="fp-tbl fp-available" style="left: 35%; top: 5%; width: 13%; height: 28%;"><div class="fp-tbl-num">5</div></div><div class="fp-tbl fp-available" style="left: 20%; top: 5%; width: 13%; height: 28%;"><div class="fp-tbl-num">6</div></div><div class="fp-tbl fp-available" style="left: 3%; top: 5%; width: 13%; height: 28%;"><div class="fp-tbl-num">7</div></div><div class="fp-tbl fp-available" style="left: 3%; top: 37%; width: 13%; height: 28%;"><div class="fp-tbl-num">8</div></div><div class="fp-tbl fp-available" style="left: 20%; top: 37%; width: 13%; height: 28%;"><div class="fp-tbl-num">4</div></div><div class="fp-tbl fp-available" style="left: 3%; top: 68%; width: 13%; height: 28%;"><div class="fp-tbl-num">9</div></div><div class="fp-tbl fp-available" style="left: 20%; top: 68%; width: 15%; height: 28%;"><div class="fp-tbl-num">14</div></div><div class="fp-tbl fp-available" style="left: 37%; top: 68%; width: 15%; height: 28%;"><div class="fp-tbl-num">15</div></div></div>
+      <div class="floor-hdr"><span class="floor-ttl">1층</span><span class="floor-sum" id="d-f1-sum"></span></div>
+      <div class="fp-canvas" id="d-fp-1f"></div>
     </div>
     <div class="floor-box">
-      <div class="floor-hdr"><span class="floor-ttl">2층</span><span class="floor-sum" id="d-f2-sum">빈자리 11/11</span></div>
-      <div class="fp-canvas" id="d-fp-2f"><div class="fp-entrance">입구</div><div class="fp-tbl fp-available" style="left: 2%; top: 5%; width: 12%; height: 26%;"><div class="fp-tbl-num">2-1</div></div><div class="fp-tbl fp-available" style="left: 16%; top: 5%; width: 12%; height: 26%;"><div class="fp-tbl-num">2-2</div></div><div class="fp-tbl fp-available" style="left: 30%; top: 5%; width: 12%; height: 26%;"><div class="fp-tbl-num">2-3</div></div><div class="fp-tbl fp-available" style="left: 44%; top: 5%; width: 12%; height: 26%;"><div class="fp-tbl-num">2-4</div></div><div class="fp-tbl fp-available" style="left: 2%; top: 37%; width: 12%; height: 28%;"><div class="fp-tbl-num">2-5</div></div><div class="fp-tbl fp-available" style="left: 16%; top: 37%; width: 12%; height: 28%;"><div class="fp-tbl-num">2-6</div></div><div class="fp-tbl fp-available" style="left: 64%; top: 5%; width: 14%; height: 28%;"><div class="fp-tbl-num">12</div></div><div class="fp-tbl fp-available" style="left: 80%; top: 5%; width: 14%; height: 28%;"><div class="fp-tbl-num">11</div></div><div class="fp-tbl fp-available" style="left: 64%; top: 40%; width: 14%; height: 28%;"><div class="fp-tbl-num">12-1</div></div><div class="fp-tbl fp-available" style="left: 80%; top: 40%; width: 14%; height: 28%;"><div class="fp-tbl-num">11-1</div></div><div class="fp-tbl fp-available" style="left: 32%; top: 37%; width: 28%; height: 55%;"><div class="fp-tbl-num">13</div></div></div>
+      <div class="floor-hdr"><span class="floor-ttl">2층</span><span class="floor-sum" id="d-f2-sum"></span></div>
+      <div class="fp-canvas" id="d-fp-2f"></div>
     </div>
   </div>
 
@@ -358,7 +358,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
   <!-- 예약 목록 -->
   <div class="res-section">
     <div class="res-hdr">
-      <span class="res-ttl" id="res-ttl">오늘 예약 (12건)</span>
+      <span class="res-ttl" id="res-ttl">예약 목록</span>
       <button class="add-btn" onclick="openAdd()">+ 예약 추가</button>
     </div>
     <div class="guide-row">
@@ -366,127 +366,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
       <span class="guide-chip">착석중 탭 → 착석 취소</span>
       <span class="guide-chip">이동 → 자리 이동</span>
     </div>
-    <div class="res-list" id="res-list"><div class="res-item no-table">
-      <div class="res-item-left">
-        <span class="res-time">10:30</span>
-        <span class="res-tbl unset">미배정</span>
-        <span class="res-name">양혜정</span>
-        <span class="res-pax">2명</span>
-        <span class="res-ch ch-n">네이버</span>
-        <span class="res-note">슈멤</span>
-      </div>
-      <div class="quick-status"><button class="qs-btn qs-arrive" onclick="quickArrive(&#39;r_1774240267545_mn24&#39;,event)">착석</button><button class="qs-btn qs-detail" onclick="openEdit(&#39;r_1774240267545_mn24&#39;,event)">상세</button></div>
-    </div><div class="res-item no-table">
-      <div class="res-item-left">
-        <span class="res-time">10:30</span>
-        <span class="res-tbl unset">미배정</span>
-        <span class="res-name">최영희</span>
-        <span class="res-pax">6명</span>
-        <span class="res-ch ch-n">네이버</span>
-        
-      </div>
-      <div class="quick-status"><button class="qs-btn qs-arrive" onclick="quickArrive(&#39;r_1774240626539_h4id&#39;,event)">착석</button><button class="qs-btn qs-detail" onclick="openEdit(&#39;r_1774240626539_h4id&#39;,event)">상세</button></div>
-    </div><div class="res-item no-table">
-      <div class="res-item-left">
-        <span class="res-time">11:00</span>
-        <span class="res-tbl unset">미배정</span>
-        <span class="res-name">유윤종</span>
-        <span class="res-pax">5명</span>
-        <span class="res-ch ch-n">네이버</span>
-        <span class="res-note">기도모임/조용한자리 룸원함(2층 11번으로)</span>
-      </div>
-      <div class="quick-status"><button class="qs-btn qs-arrive" onclick="quickArrive(&#39;r_1774240706232_ulda&#39;,event)">착석</button><button class="qs-btn qs-detail" onclick="openEdit(&#39;r_1774240706232_ulda&#39;,event)">상세</button></div>
-    </div><div class="res-item no-table">
-      <div class="res-item-left">
-        <span class="res-time">11:00</span>
-        <span class="res-tbl unset">미배정</span>
-        <span class="res-name">박수민</span>
-        <span class="res-pax">4명</span>
-        <span class="res-ch ch-n">네이버</span>
-        <span class="res-note">2번요청</span>
-      </div>
-      <div class="quick-status"><button class="qs-btn qs-arrive" onclick="quickArrive(&#39;r_1774240923504_cmf6&#39;,event)">착석</button><button class="qs-btn qs-detail" onclick="openEdit(&#39;r_1774240923504_cmf6&#39;,event)">상세</button></div>
-    </div><div class="res-item no-table">
-      <div class="res-item-left">
-        <span class="res-time">11:00</span>
-        <span class="res-tbl unset">미배정</span>
-        <span class="res-name">이윤지</span>
-        <span class="res-pax">3명</span>
-        <span class="res-ch ch-n">네이버</span>
-        
-      </div>
-      <div class="quick-status"><button class="qs-btn qs-arrive" onclick="quickArrive(&#39;r_1774242546297_ey4t&#39;,event)">착석</button><button class="qs-btn qs-detail" onclick="openEdit(&#39;r_1774242546297_ey4t&#39;,event)">상세</button></div>
-    </div><div class="res-item no-table">
-      <div class="res-item-left">
-        <span class="res-time">11:00</span>
-        <span class="res-tbl unset">미배정</span>
-        <span class="res-name">주한나</span>
-        <span class="res-pax">2명</span>
-        <span class="res-ch ch-n">네이버</span>
-        <span class="res-note">슈멤</span>
-      </div>
-      <div class="quick-status"><button class="qs-btn qs-arrive" onclick="quickArrive(&#39;r_1774242616980_ifws&#39;,event)">착석</button><button class="qs-btn qs-detail" onclick="openEdit(&#39;r_1774242616980_ifws&#39;,event)">상세</button></div>
-    </div><div class="res-item no-table">
-      <div class="res-item-left">
-        <span class="res-time">11:30</span>
-        <span class="res-tbl unset">미배정</span>
-        <span class="res-name">김예린</span>
-        <span class="res-pax">2명</span>
-        <span class="res-ch ch-n">네이버</span>
-        <span class="res-note">슈멤</span>
-      </div>
-      <div class="quick-status"><button class="qs-btn qs-arrive" onclick="quickArrive(&#39;r_1774242661024_i8oi&#39;,event)">착석</button><button class="qs-btn qs-detail" onclick="openEdit(&#39;r_1774242661024_i8oi&#39;,event)">상세</button></div>
-    </div><div class="res-item no-table">
-      <div class="res-item-left">
-        <span class="res-time">11:30</span>
-        <span class="res-tbl unset">미배정</span>
-        <span class="res-name">김예진</span>
-        <span class="res-pax">3명</span>
-        <span class="res-ch ch-n">네이버</span>
-        <span class="res-note">조용한 자리</span>
-      </div>
-      <div class="quick-status"><button class="qs-btn qs-arrive" onclick="quickArrive(&#39;r_1774265862109_6el2&#39;,event)">착석</button><button class="qs-btn qs-detail" onclick="openEdit(&#39;r_1774265862109_6el2&#39;,event)">상세</button></div>
-    </div><div class="res-item no-table">
-      <div class="res-item-left">
-        <span class="res-time">12:00</span>
-        <span class="res-tbl unset">미배정</span>
-        <span class="res-name">김혜진</span>
-        <span class="res-pax">3명</span>
-        <span class="res-ch ch-n">네이버</span>
-        
-      </div>
-      <div class="quick-status"><button class="qs-btn qs-arrive" onclick="quickArrive(&#39;r_1774242697315_m158&#39;,event)">착석</button><button class="qs-btn qs-detail" onclick="openEdit(&#39;r_1774242697315_m158&#39;,event)">상세</button></div>
-    </div><div class="res-item no-table">
-      <div class="res-item-left">
-        <span class="res-time">12:00</span>
-        <span class="res-tbl unset">미배정</span>
-        <span class="res-name">이지연</span>
-        <span class="res-pax">2명</span>
-        <span class="res-ch ch-n">네이버</span>
-        
-      </div>
-      <div class="quick-status"><button class="qs-btn qs-arrive" onclick="quickArrive(&#39;r_1774258601898_idv2&#39;,event)">착석</button><button class="qs-btn qs-detail" onclick="openEdit(&#39;r_1774258601898_idv2&#39;,event)">상세</button></div>
-    </div><div class="res-item no-table">
-      <div class="res-item-left">
-        <span class="res-time">19:00</span>
-        <span class="res-tbl unset">미배정</span>
-        <span class="res-name">한윤영</span>
-        <span class="res-pax">6명</span>
-        <span class="res-ch ch-n">네이버</span>
-        <span class="res-note">2번자리</span>
-      </div>
-      <div class="quick-status"><button class="qs-btn qs-arrive" onclick="quickArrive(&#39;r_1774258636374_7zr6&#39;,event)">착석</button><button class="qs-btn qs-detail" onclick="openEdit(&#39;r_1774258636374_7zr6&#39;,event)">상세</button></div>
-    </div><div class="res-item no-table">
-      <div class="res-item-left">
-        <span class="res-time">19:00</span>
-        <span class="res-tbl unset">미배정</span>
-        <span class="res-name">안혜성</span>
-        <span class="res-pax">7명</span>
-        <span class="res-ch ch-n">네이버</span>
-        
-      </div>
-      <div class="quick-status"><button class="qs-btn qs-arrive" onclick="quickArrive(&#39;r_1774258661560_rbwe&#39;,event)">착석</button><button class="qs-btn qs-detail" onclick="openEdit(&#39;r_1774258661560_rbwe&#39;,event)">상세</button></div>
-    </div></div>
+    <div class="res-list" id="res-list"></div>
   </div>
 
 </div><!-- .app -->
@@ -498,8 +378,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
   <div class="sheet" onclick="event.stopPropagation()">
     <div class="sheet-handle"></div>
     <div class="mode-tabs" id="mode-tabs">
-      <button class="mode-tab active" onclick="setMode(&#39;quick&#39;)">⚡ 빠른 입력</button>
-      <button class="mode-tab" onclick="setMode(&#39;detail&#39;)">상세 입력</button>
+      <button class="mode-tab active" onclick="setMode('quick')">⚡ 빠른 입력</button>
+      <button class="mode-tab" onclick="setMode('detail')">상세 입력</button>
     </div>
     <div id="modal-content"></div>
   </div>
@@ -596,6 +476,14 @@ async function loadData(){
     setSyncStatus('error','연결 오류 — 새로고침을 눌러주세요');
     showToast('⚠ 데이터 불러오기 실패: '+e.message);
   }
+}
+// ★ 백그라운드 조용한 동기화 — 모달 열릴 때 사용 (화면 재렌더 없이 RES만 갱신)
+async function loadDataSilent(){
+  try{
+    const data=await apiCall({action:'getAll'});
+    RES=data.reservations||[];
+    setSyncStatus('ok',`마지막 동기화: ${new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})}`);
+  }catch(e){/* 조용히 실패 — 기존 로컬 데이터 유지 */}
 }
 
 /* ★ 낙관적 업데이트: 화면 즉시 반영 → 백그라운드에서 시트 저장 */
@@ -935,16 +823,21 @@ function updateQPreview(){const p=document.getElementById('q-preview'),b=documen
 function refreshQuick(){if(curMode==='quick')document.getElementById('modal-content').innerHTML=buildQuickForm();}
 
 async function saveQuick(){
+  if(_isSaving)return;
   const n=document.getElementById('q-name');if(n)qName=n.value.trim();
   if(!qName||!qDate||!qTime){alert('필수 항목을 입력해 주세요.');return;}
   const newRes={date:qDate,time:qTime,name:qName,phone:qPhone,pax:qPax,tables:[],floor:1,ch:qCh,note:qNote,st:'confirmed',merged:false};
-  // 즉시 닫고 화면 반영 (낙관적)
+  _isSaving=true;
   document.getElementById('modal-overlay').classList.remove('show');
   qName='';qPax=2;qTime='';qPhone='';qNote='';qOptOpen=false;
   showToast(`${newRes.name} 예약 추가 완료`);
   try{
-    await apiAdd(newRes); // 백그라운드 저장
-  }catch(err){showToast('⚠ 저장 실패: '+err.message);}
+    await apiAdd(newRes);
+  }catch(err){
+    showToast('저장 실패: '+err.message);
+  }finally{
+    _isSaving=false;
+  }
 }
 
 /* ── 상세 입력 폼 ── */
@@ -1002,27 +895,41 @@ function setMode(mode){
 function openEdit(id,e){
   if(e)e.stopPropagation();
   const r=RES.find(x=>x.id===id);if(!r)return;
-  origId=id;draft=JSON.parse(JSON.stringify(r));fpFloor=draft.floor||1;curMode='detail';
+  // ★ 서버 데이터 기준으로 draft 설정 (로컬 RES의 최신 값 사용)
+  origId=id;
+  draft=JSON.parse(JSON.stringify(r));
+  fpFloor=draft.floor||1;curMode='detail';
   document.getElementById('mode-tabs').style.display='none';
   document.getElementById('modal-content').innerHTML=buildDetailForm()+`<div class="sheet-foot"><button class="btn-save" onclick="saveDetail()">수정 저장</button><button class="btn-cancel-res" onclick="cancelRes()">예약 취소</button><button class="btn-close-f" onclick="closeSheet()">닫기</button></div>`;
   renderModalFP(fpFloor);
   document.getElementById('modal-overlay').classList.add('show');
+  // ★ 백그라운드에서 최신 데이터 동기화 (다기기 충돌 방지)
+  loadDataSilent();
 }
 function closeSheet(){document.getElementById('modal-overlay').classList.remove('show');origId=null;render();}
 function bgClick(e){if(e.target===document.getElementById('modal-overlay'))closeSheet();}
 
+let _isSaving=false;
 async function saveDetail(){
+  if(_isSaving)return;
   const fn=document.getElementById('fn'),fx=document.getElementById('fx'),fp2=document.getElementById('fp2'),ta=document.querySelector('#dfi textarea');
   if(fn)draft.name=fn.value.trim();if(fx)draft.pax=parseInt(fx.value)||0;if(fp2)draft.phone=fp2.value.trim();if(ta)draft.note=ta.value.trim();
   if(!draft.name||!draft.pax){alert('필수 항목을 입력해 주세요.');return;}
-  // 즉시 닫고 화면 반영
+  // ★ origId, draft를 로컬 변수에 즉시 캡처 — 모달 닫힌 후 전역변수 변경에 영향 안 받음
+  const localId=origId;
+  const localDraft={...draft};
+  _isSaving=true;
   document.getElementById('modal-overlay').classList.remove('show');
-  showToast(origId===null?`${draft.name} 예약 추가 완료`:`${draft.name} 수정 완료`);
+  origId=null;
+  showToast(localId===null?`${localDraft.name} 예약 추가 완료`:`${localDraft.name} 수정 완료`);
   try{
-    if(origId===null){await apiAdd({...draft});}
-    else{await apiUpdate({...draft});}
-    origId=null;
-  }catch(err){showToast('⚠ 저장 실패: '+err.message);origId=null;}
+    if(localId===null){await apiAdd(localDraft);}
+    else{await apiUpdate({...localDraft,id:localId});}
+  }catch(err){
+    showToast('저장 실패: '+err.message);
+  }finally{
+    _isSaving=false;
+  }
 }
 async function cancelRes(){
   if(!confirm(`${draft.name} 고객의 예약을 취소하시겠습니까?`))return;
@@ -1045,9 +952,8 @@ updateDateDisplay();
 // 데이터 로드
 loadData();
 
-// 5분마다 자동 동기화
-setInterval(loadData, 5*60*1000);
+// 1분마다 자동 동기화 (다기기 데이터 차이 최소화)
+setInterval(loadData, 60*1000);
 </script>
-
-
-</body></html>
+</body>
+</html>
