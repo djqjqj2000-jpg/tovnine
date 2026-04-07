@@ -492,14 +492,15 @@ async function apiAdd(resData){
   const tempId='temp_'+Date.now();
   resData.id=tempId;
   RES.push({...resData});
-  render(); // 즉시 화면 반영
+  render(); // 즉시 화면 반영 (버튼에 temp_ id 포함)
   setSyncStatus('syncing','저장 중...');
   try{
     // 2) 백그라운드에서 실제 저장
     const result=await apiCall({action:'add',data:JSON.stringify(resData)});
-    // 3) 임시 id → 실제 id로 교체
+    // 3) 임시 id → 실제 id로 교체 후 화면 재렌더 (버튼 id 갱신)
     const idx=RES.findIndex(r=>r.id===tempId);
     if(idx>=0)RES[idx].id=result.id;
+    render(); // ★ 실제 id로 버튼 재렌더 — 이제 상세 버튼이 정상 작동
     setSyncStatus('ok',`마지막 동기화: ${new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})}`);
     return result;
   }catch(err){
@@ -892,10 +893,26 @@ function setMode(mode){
   if(mode==='quick'){document.getElementById('modal-content').innerHTML=buildQuickForm();}
   else{document.getElementById('modal-content').innerHTML=buildDetailForm()+`<div class="sheet-foot"><button class="btn-save" onclick="saveDetail()">예약 저장</button><button class="btn-close-f" onclick="closeSheet()">닫기</button></div>`;renderModalFP(fpFloor);}
 }
-function openEdit(id,e){
+async function openEdit(id,e){
   if(e)e.stopPropagation();
+  // ★ 임시 id(temp_)인 경우 — 백그라운드 저장 완료될 때까지 잠깐 대기
+  if(String(id).startsWith('temp_')){
+    showToast('저장 완료 후 열립니다...');
+    let waited=0;
+    while(String(id).startsWith('temp_')&&waited<5000){
+      // RES에서 현재 temp id 항목의 실제 id로 갱신 확인
+      const found=RES.find(x=>x.id===id);
+      if(!found){return;} // 사라졌으면 중단
+      await new Promise(r=>setTimeout(r,200));
+      waited+=200;
+      id=RES.find(x=>x.id===id)?.id||id; // 혹시 id가 바뀌었는지 재확인
+    }
+    if(String(id).startsWith('temp_')){
+      showToast('저장 중입니다. 잠시 후 다시 눌러주세요.');
+      return;
+    }
+  }
   const r=RES.find(x=>x.id===id);if(!r)return;
-  // ★ 서버 데이터 기준으로 draft 설정 (로컬 RES의 최신 값 사용)
   origId=id;
   draft=JSON.parse(JSON.stringify(r));
   fpFloor=draft.floor||1;curMode='detail';
@@ -903,7 +920,6 @@ function openEdit(id,e){
   document.getElementById('modal-content').innerHTML=buildDetailForm()+`<div class="sheet-foot"><button class="btn-save" onclick="saveDetail()">수정 저장</button><button class="btn-cancel-res" onclick="cancelRes()">예약 취소</button><button class="btn-close-f" onclick="closeSheet()">닫기</button></div>`;
   renderModalFP(fpFloor);
   document.getElementById('modal-overlay').classList.add('show');
-  // ★ 백그라운드에서 최신 데이터 동기화 (다기기 충돌 방지)
   loadDataSilent();
 }
 function closeSheet(){document.getElementById('modal-overlay').classList.remove('show');origId=null;render();}
