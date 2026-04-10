@@ -457,14 +457,65 @@ function setSyncStatus(state, msg){
   msgEl.textContent=msg;
 }
 
-async function apiCall(params){
-  const url=API_URL+'?'+new URLSearchParams(params).toString();
-  const res=await fetch(url);
-  const data=await res.json();
-  if(data.error) throw new Error(data.error);
-  return data;
+/* ★★★ 개선된 apiCall — 타임아웃 + 재시도 + JSON 검증 ★★★
+   1. 15초 타임아웃 (응답이 안 오면 강제 종료)
+   2. 실패 시 1초, 2초 간격으로 자동 재시도 (최대 3번 시도)
+   3. 응답이 JSON이 아니면 명확한 에러로 처리 (HTML 페이지 반환 케이스 대응)
+*/
+async function apiCall(params, options={}){
+  const maxRetries = options.maxRetries !== undefined ? options.maxRetries : 2; // 추가 재시도 횟수
+  const timeoutMs = options.timeoutMs || 15000;
+  const url = API_URL+'?'+new URLSearchParams(params).toString();
+
+  let lastError = null;
+  for(let attempt=0; attempt<=maxRetries; attempt++){
+    try{
+      // AbortController로 타임아웃 구현
+      const controller = new AbortController();
+      const timeoutId = setTimeout(()=>controller.abort(), timeoutMs);
+
+      let res;
+      try{
+        res = await fetch(url, {signal: controller.signal});
+      }finally{
+        clearTimeout(timeoutId);
+      }
+
+      // HTTP 상태 확인
+      if(!res.ok){
+        throw new Error(`서버 응답 오류 (${res.status})`);
+      }
+
+      // 응답을 텍스트로 먼저 받아서 JSON인지 확인
+      const text = await res.text();
+
+      // JSON 파싱 시도
+      let data;
+      try{
+        data = JSON.parse(text);
+      }catch(parseErr){
+        // JSON이 아니면 HTML 에러 페이지일 가능성 높음
+        throw new Error('서버 응답 형식 오류 — 잠시 후 다시 시도됩니다');
+      }
+
+      if(data.error) throw new Error(data.error);
+      return data;
+
+    }catch(e){
+      lastError = e;
+      // 마지막 시도가 아니면 잠시 대기 후 재시도
+      if(attempt < maxRetries){
+        const waitMs = (attempt+1) * 1000; // 1초, 2초
+        await new Promise(r=>setTimeout(r, waitMs));
+      }
+    }
+  }
+
+  // 모든 재시도 실패
+  throw lastError || new Error('알 수 없는 오류');
 }
 
+/* ★ 사용자가 직접 호출하는 로드 — 실패 시 토스트 표시 */
 async function loadData(){
   setSyncStatus('syncing','데이터 불러오는 중...');
   try{
@@ -477,10 +528,25 @@ async function loadData(){
     showToast('⚠ 데이터 불러오기 실패: '+e.message);
   }
 }
-// ★ 백그라운드 조용한 동기화 — 모달 열릴 때 사용 (화면 재렌더 없이 RES만 갱신)
+
+/* ★ 자동 동기화 전용 — 실패해도 토스트 안 띄움 (조용히 다음 시도 대기) */
+async function loadDataAuto(){
+  try{
+    const data=await apiCall({action:'getAll'}, {maxRetries:1}); // 자동은 재시도 1번만
+    RES=data.reservations||[];
+    setSyncStatus('ok',`마지막 동기화: ${new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})}`);
+    render();
+  }catch(e){
+    // 자동 동기화는 조용히 실패 — 다음 1분 후 재시도
+    // 단, 동기화 표시줄에는 가볍게 표시 (사용자가 인지할 수 있게)
+    setSyncStatus('error','일시적 연결 지연 — 자동 재시도 중');
+  }
+}
+
+/* ★ 백그라운드 조용한 동기화 — 모달 열릴 때 사용 (화면 재렌더 없이 RES만 갱신) */
 async function loadDataSilent(){
   try{
-    const data=await apiCall({action:'getAll'});
+    const data=await apiCall({action:'getAll'}, {maxRetries:1});
     RES=data.reservations||[];
     setSyncStatus('ok',`마지막 동기화: ${new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})}`);
   }catch(e){/* 조용히 실패 — 기존 로컬 데이터 유지 */}
@@ -968,8 +1034,8 @@ updateDateDisplay();
 // 데이터 로드
 loadData();
 
-// 1분마다 자동 동기화 (다기기 데이터 차이 최소화)
-setInterval(loadData, 60*1000);
+// 1분마다 자동 동기화 — 자동 전용 함수 사용 (실패 시 토스트 안 띄움)
+setInterval(loadDataAuto, 60*1000);
 </script>
 </body>
 </html>
