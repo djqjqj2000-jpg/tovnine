@@ -584,9 +584,7 @@ async function apiAdd(resData){
 }
 
 async function apiUpdate(resData){
-  console.log('━━━ [4.apiUpdate 진입] resData.id:', resData.id, '| name:', resData.name, '| st:', resData.st, '━━━');
   const idx=RES.findIndex(r=>r.id===resData.id);
-  console.log('  RES.findIndex 결과:', idx, idx>=0?'(찾음)':'(못찾음 ⚠)');
   const backup=idx>=0?{...RES[idx]}:null;
   if(idx>=0)RES[idx]={...resData};
   render();
@@ -594,10 +592,8 @@ async function apiUpdate(resData){
   try{
     // 2) 백그라운드에서 실제 저장
     const apiResult=await apiCall({action:'update',data:JSON.stringify(resData)});
-    console.log('  ✅ Apps Script 응답:', apiResult);
     setSyncStatus('ok',`마지막 동기화: ${new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})}`);
   }catch(err){
-    console.log('  ❌ Apps Script 에러:', err.message);
     // 실패 시 롤백
     if(backup&&idx>=0)RES[idx]=backup;
     render();
@@ -607,18 +603,13 @@ async function apiUpdate(resData){
 }
 
 async function apiUpdateField(id, fields){
-  console.log('━━━ [3.apiUpdateField 진입] id:', id, '━━━');
   let r=RES.find(x=>x.id===id);
-  console.log('  1차 RES.find 결과:', r);
   if(!r){
-    console.log('  ⚠ RES에 없음 → loadDataSilent 호출');
     try{await loadDataSilent();}catch(e){}
     r=RES.find(x=>x.id===id);
-    console.log('  2차 RES.find 결과:', r);
   }
   if(!r)throw new Error('예약을 찾을 수 없습니다 (id: '+id+')');
   const updated={...r,...fields};
-  console.log('  → apiUpdate에 전달할 객체:', updated);
   await apiUpdate(updated);
 }
 
@@ -1033,7 +1024,6 @@ function setMode(mode){
   else{document.getElementById('modal-content').innerHTML=buildDetailForm()+`<div class="sheet-foot"><button class="btn-save" onclick="saveDetail()">예약 저장</button><button class="btn-close-f" onclick="closeSheet()">닫기</button></div>`;renderModalFP(fpFloor);}
 }
 async function openEdit(id,e){
-  console.log('━━━ [0.openEdit 진입] 클릭된 id:', id, '━━━');
   if(e)e.stopPropagation();
   // ★ 임시 id(temp_)인 경우 — 백그라운드 저장 완료될 때까지 잠깐 대기
   if(String(id).startsWith('temp_')){
@@ -1054,7 +1044,6 @@ async function openEdit(id,e){
   }
   const r=RES.find(x=>x.id===id);if(!r)return;
   origId=id;
-  console.log('  → origId 설정:', origId, '| 이름:', r.name, '| 상태:', r.st);
   draft=JSON.parse(JSON.stringify(r));
   fpFloor=draft.floor||1;curMode='detail';
   document.getElementById('mode-tabs').style.display='none';
@@ -1070,10 +1059,10 @@ let _isSaving=false;
 async function saveDetail(){
   if(_isSaving)return;
   // ★ 가드: origId가 null이거나 이미 취소된 예약이면 재저장 금지 (취소 직후 saveDetail 트리거 방어)
-  if(origId===null){console.log('⚠ saveDetail 차단: origId null (취소 직후 가능성)');closeSheet();return;}
-  if(draft && draft.st==='cancelled'){console.log('⚠ saveDetail 차단: 이미 cancelled 상태');closeSheet();return;}
+  if(origId===null){closeSheet();return;}
+  if(draft && draft.st==='cancelled'){closeSheet();return;}
   const existing=RES.find(x=>x.id===origId);
-  if(existing && existing.st==='cancelled'){console.log('⚠ saveDetail 차단: RES에서 cancelled');closeSheet();return;}
+  if(existing && existing.st==='cancelled'){closeSheet();return;}
   const fn=document.getElementById('fn'),fx=document.getElementById('fx'),fp2=document.getElementById('fp2'),ta=document.querySelector('#dfi textarea');
   if(fn)draft.name=fn.value.trim();if(fx)draft.pax=parseInt(fx.value)||0;if(fp2)draft.phone=fp2.value.trim();if(ta)draft.note=ta.value.trim();
   if(!draft.name||!draft.pax){alert('필수 항목을 입력해 주세요.');return;}
@@ -1103,36 +1092,24 @@ async function saveDetail(){
   }
 }
 async function cancelRes(){
-  console.log('━━━ [1.cancelRes 진입] ━━━');
-  console.log('  origId:', origId);
-  console.log('  draft.id:', draft.id);
-  console.log('  draft.name:', draft.name);
-  console.log('  RES에서 origId로 찾기:', RES.find(x=>x.id===origId));
   if(!confirm(`${draft.name} 고객의 예약을 취소하시겠습니까?`))return;
   const localId=origId;
   const localName=draft.name;
-  console.log('  → localId 캡처:', localId);
   try{
-    console.log('━━━ [2.apiUpdateField 호출] localId:', localId, '━━━');
     await apiUpdateField(localId,{st:'cancelled'});
     const idx=RES.findIndex(x=>x.id===localId);
     if(idx>=0)RES[idx]={...RES[idx],st:'cancelled'};
     // ★ draft 자체도 cancelled로 표시 — 이후 saveDetail이 실수로 호출돼도 방어
     if(draft)draft.st='cancelled';
-    console.log('━━━ [5.취소 후 RES 상태] ━━━');
-    console.log('  RES에서 localId 찾기:', RES.find(x=>x.id===localId));
     showToast(`${localName} 예약 취소 처리 완료`);
     // ★ 모달 확실히 닫기 — 기존 코드 대신 closeSheet() 사용
     closeSheet();
     setTimeout(()=>{
-      console.log('━━━ [6.800ms 후 시트 재동기화] ━━━');
       loadDataSilent().then(()=>{
-        console.log('  재동기화 후 RES에서 localId:', RES.find(x=>x.id===localId));
         render();
       }).catch(()=>{});
     },800);
   }catch(err){
-    console.log('━━━ [ERR.cancelRes 에러] ━━━', err.message);
     showToast('⚠ 취소 실패: '+err.message);
   }
 }
