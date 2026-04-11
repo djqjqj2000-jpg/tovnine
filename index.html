@@ -604,8 +604,13 @@ async function apiUpdate(resData){
 }
 
 async function apiUpdateField(id, fields){
-  const r=RES.find(x=>x.id===id);
-  if(!r)return;
+  let r=RES.find(x=>x.id===id);
+  // 못 찾으면 한 번 시트 동기화 후 재시도 (낙관 업데이트 직후 RES 교체된 경우 대비)
+  if(!r){
+    try{await loadDataSilent();}catch(e){}
+    r=RES.find(x=>x.id===id);
+  }
+  if(!r)throw new Error('예약을 찾을 수 없습니다 (id: '+id+')');
   const updated={...r,...fields};
   await apiUpdate(updated);
 }
@@ -1085,12 +1090,23 @@ async function saveDetail(){
 }
 async function cancelRes(){
   if(!confirm(`${draft.name} 고객의 예약을 취소하시겠습니까?`))return;
+  // 모달 닫기 전에 id와 이름을 로컬 변수에 캡처 (전역변수 변경 영향 차단)
+  const localId=origId;
+  const localName=draft.name;
   try{
-    await apiUpdateField(origId,{st:'cancelled'});
-    showToast(`${draft.name} 예약 취소 처리`);
+    await apiUpdateField(localId,{st:'cancelled'});
+    // 시트 반영 확인 — loadDataSilent로 갱신 후 실제 cancelled로 바뀌었는지 검증
+    await loadDataSilent();
+    const after=RES.find(x=>x.id===localId);
+    if(after && after.st!=='cancelled'){
+      throw new Error('시트 반영 실패 — 다시 시도해 주세요');
+    }
+    showToast(`${localName} 예약 취소 처리 완료`);
     document.getElementById('modal-overlay').classList.remove('show');origId=null;
-    syncNow();
-  }catch(err){showToast('⚠ 처리 실패: '+err.message);}
+    render();
+  }catch(err){
+    showToast('⚠ 취소 실패: '+err.message);
+  }
 }
 
 /* ── 토스트 ── */
