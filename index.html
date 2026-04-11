@@ -833,14 +833,14 @@ function render(){renderStats();renderDashFP();renderList();}
 async function quickArrive(id,e){
   e.stopPropagation();
   const r=RES.find(x=>x.id===id);if(!r)return;
-  try{await apiUpdateField(id,{st:'arrived'});showToast(`${r.name} 착석 처리 완료`);}
+  try{await apiUpdateField(id,{st:'arrived'});showToast(`${r.name} 착석 처리 완료`);syncNow();}
   catch(err){showToast('⚠ 처리 실패: '+err.message);}
 }
 async function cancelArrive(id,e){
   e.stopPropagation();
   const r=RES.find(x=>x.id===id);if(!r)return;
   if(!confirm(`${r.name} 고객의 착석을 취소하고 예약확정으로 되돌릴까요?`))return;
-  try{await apiUpdateField(id,{st:'confirmed'});showToast(`${r.name} 착석 취소 — 예약확정으로 변경`);}
+  try{await apiUpdateField(id,{st:'confirmed'});showToast(`${r.name} 착석 취소 — 예약확정으로 변경`);syncNow();}
   catch(err){showToast('⚠ 처리 실패: '+err.message);}
 }
 /* ★ 이용완료 — 배치도에서 즉시 사라짐 */
@@ -850,6 +850,7 @@ async function quickDone(id,e){
   try{
     await apiUpdateField(id,{st:'done'});
     showToast(`${r.name} 이용완료 — 테이블 비워짐`);
+    syncNow();
   }catch(err){showToast('⚠ 처리 실패: '+err.message);}
 }
 
@@ -888,6 +889,7 @@ async function confirmMove(){
     await apiUpdateField(moveResId,{tables:[moveTargetTbl],floor:T1.includes(moveTargetTbl)?1:2,merged:false});
     showToast(`${r.name} ${old}번 → ${moveTargetTbl}번 이동 완료`);
     closeMoveSheet();
+    syncNow();
   }catch(err){showToast('⚠ 처리 실패: '+err.message);}
 }
 
@@ -923,11 +925,39 @@ function toggleOpt(){qOptOpen=!qOptOpen;refreshQuick();}
 function updateQPreview(){const p=document.getElementById('q-preview'),b=document.getElementById('q-save-btn');const ok=qName.trim()&&qPax&&qTime&&qDate;if(p)p.innerHTML=ok?`<b>${getDateLabel(qDate)} ${qTime}</b> · <b>${qName.trim()}</b> · <b>${qPax}명</b>`:'날짜, 이름, 인원, 시간을 입력하면 저장할 수 있어요';if(b)b.disabled=!ok;}
 function refreshQuick(){if(curMode==='quick')document.getElementById('modal-content').innerHTML=buildQuickForm();}
 
+/* ── 동명 예약 자동 넘버링 ──
+   같은 날짜에 같은 "기본 이름"의 활성 예약이 있으면:
+   - 첫 번째 항목을 "이름 1"로 소급 변경 (백그라운드 update)
+   - 새 항목은 "이름 N"으로 반환
+   기본 이름 추출 규칙: 끝의 " 숫자" 패턴을 제거한 부분
+*/
+function getBaseName(name){return String(name||'').replace(/\s+\d+$/,'').trim();}
+async function applyAutoNumbering(date,rawName){
+  const base=getBaseName(rawName);
+  if(!base)return rawName;
+  // 같은 날짜, 활성, 같은 base 이름인 예약들
+  const same=RES.filter(r=>r.date===date&&r.st!=='cancelled'&&r.type!=='walkin'&&getBaseName(r.name)===base);
+  if(same.length===0)return base; // 첫 등록 — 번호 없이
+  // 기존에 가장 큰 번호 찾기
+  let maxN=0;
+  same.forEach(r=>{const m=String(r.name).match(/\s(\d+)$/);if(m){maxN=Math.max(maxN,parseInt(m[1]));}});
+  // 첫 충돌이면 기존 1건을 "base 1"로 소급 변경
+  if(maxN===0&&same.length===1&&same[0].name===base){
+    try{await apiUpdate({...same[0],name:`${base} 1`});}catch(e){/* 실패해도 새 등록은 진행 */}
+    return `${base} 2`;
+  }
+  return `${base} ${maxN+1}`;
+}
+/* ── 변경 직후 강제 동기화 — 1분 안 기다리고 즉시 ── */
+async function syncNow(){try{await loadDataSilent();render();}catch(e){}}
+
 async function saveQuick(){
   if(_isSaving)return;
   const n=document.getElementById('q-name');if(n)qName=n.value.trim();
   if(!qName||!qDate||!qTime){alert('필수 항목을 입력해 주세요.');return;}
-  const newRes={date:qDate,time:qTime,name:qName,phone:qPhone,pax:qPax,tables:[],floor:1,ch:qCh,note:qNote,st:'confirmed',merged:false};
+  // 자동 넘버링 적용
+  const finalName=await applyAutoNumbering(qDate,qName);
+  const newRes={date:qDate,time:qTime,name:finalName,phone:qPhone,pax:qPax,tables:[],floor:1,ch:qCh,note:qNote,st:'confirmed',merged:false};
   _isSaving=true;
   document.getElementById('modal-overlay').classList.remove('show');
   qName='';qPax=2;qTime='';qPhone='';qNote='';qOptOpen=false;
@@ -1034,6 +1064,10 @@ async function saveDetail(){
   // ★ origId, draft를 로컬 변수에 즉시 캡처 — 모달 닫힌 후 전역변수 변경에 영향 안 받음
   const localId=origId;
   const localDraft={...draft};
+  // 신규 추가일 때만 자동 넘버링 (수정은 그대로)
+  if(localId===null&&localDraft.type!=='walkin'){
+    localDraft.name=await applyAutoNumbering(localDraft.date,localDraft.name);
+  }
   _isSaving=true;
   document.getElementById('modal-overlay').classList.remove('show');
   origId=null;
@@ -1041,6 +1075,7 @@ async function saveDetail(){
   try{
     if(localId===null){await apiAdd(localDraft);}
     else{await apiUpdate({...localDraft,id:localId});}
+    syncNow();
   }catch(err){
     showToast('저장 실패: '+err.message);
   }finally{
@@ -1053,6 +1088,7 @@ async function cancelRes(){
     await apiUpdateField(origId,{st:'cancelled'});
     showToast(`${draft.name} 예약 취소 처리`);
     document.getElementById('modal-overlay').classList.remove('show');origId=null;
+    syncNow();
   }catch(err){showToast('⚠ 처리 실패: '+err.message);}
 }
 
