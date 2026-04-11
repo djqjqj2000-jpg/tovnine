@@ -585,6 +585,7 @@ async function apiAdd(resData){
 
 async function apiUpdate(resData){
   console.log('━━━ [4.apiUpdate 진입] resData.id:', resData.id, '| name:', resData.name, '| st:', resData.st, '━━━');
+  console.log('  📍 호출 스택:', new Error().stack);
   const idx=RES.findIndex(r=>r.id===resData.id);
   console.log('  RES.findIndex 결과:', idx, idx>=0?'(찾음)':'(못찾음 ⚠)');
   const backup=idx>=0?{...RES[idx]}:null;
