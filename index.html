@@ -130,6 +130,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
 .res-tbl{font-size:10px;padding:2px 6px;border-radius:8px;background:var(--c50);color:var(--c800);border:0.5px solid var(--c100);white-space:nowrap;}
 .res-tbl.mp{background:var(--p50);color:var(--p800);border-color:var(--p100);}
 .res-tbl.unset{background:var(--a50);color:var(--a800);border-color:var(--a100);}
+.res-walkin{font-size:10px;padding:2px 6px;border-radius:8px;background:var(--c400);color:#fff;font-weight:600;white-space:nowrap;}
+.tbl-walkin-badge{font-size:7px;background:var(--c400);color:#fff;padding:1px 3px;border-radius:3px;font-weight:600;}
 .res-name{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:80px;}
 .res-pax{font-size:11px;color:var(--text2);white-space:nowrap;}
 .res-ch{font-size:10px;padding:1px 5px;border-radius:8px;}
@@ -327,7 +329,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
     <div class="stat"><div class="stat-lbl">오늘 예약</div><div class="stat-val" id="s-tot">-</div><div class="stat-sub">건</div></div>
     <div class="stat"><div class="stat-lbl">예약 인원</div><div class="stat-val" id="s-pax">-</div><div class="stat-sub">명</div></div>
     <div class="stat"><div class="stat-lbl">잔여 테이블</div><div class="stat-val" id="s-avl">-</div><div class="stat-sub">/ 21개</div></div>
-    <div class="stat"><div class="stat-lbl">합석</div><div class="stat-val" id="s-mrg">-</div><div class="stat-sub">건</div></div>
+    <div class="stat"><div class="stat-lbl">워크인</div><div class="stat-val" id="s-walk">-</div><div class="stat-sub">건</div></div>
   </div>
 
   <div class="toolbar">
@@ -703,8 +705,11 @@ function renderFPCanvas(canvasId,layout,mode,selList,onClickFn,hlTables,conflict
     let inner=`<div class="fp-tbl-num">${t.n}</div>`;
     if(mode==='dash'){
       const info=getCardInfo(t.n);
-      if(info){
-        if(info.seated)inner+=`<div class="tbl-seated">${info.seated.name}</div>`;
+     if(info){
+        if(info.seated){
+          if(info.seated.type==='walkin')inner+=`<div class="tbl-seated"><span class="tbl-walkin-badge">W</span> ${info.seated.name}</div>`;
+          else inner+=`<div class="tbl-seated">${info.seated.name}</div>`;
+        }
         if(info.upcoming.length>0){
           const next=info.upcoming[0];
           const isToday=sameDay(viewDate,TODAY);
@@ -741,10 +746,46 @@ function renderDashFP(){
   document.getElementById('d-f2-sum').textContent=`빈자리 ${T2.length-r2}/${T2.length}`;
 }
 function clickDashTbl(n){
-  const info=getCardInfo(n);let tr=null;
+  const info=getCardInfo(n);
+  // 빈 테이블 → 워크인 등록 분기 (오늘 날짜에서만)
+  if(!info && sameDay(viewDate,TODAY)){
+    if(confirm(`${n}번 테이블에 워크인 손님을 착석 처리할까요?`)){
+      addWalkin(n);
+    }
+    return;
+  }
+  let tr=null;
   if(info){if(info.seated)tr=info.seated;else if(info.upcoming.length>0)tr=info.upcoming[0];}
   hlResId=tr?(hlResId===tr.id?null:tr.id):null;
   renderDashFP();renderList();
+}
+
+/* ── 워크인 추가 ── */
+async function addWalkin(tableNum){
+  const todayKey=dateKey(TODAY);
+  // 당일 워크인 번호 자동 부여
+  const todayWalkins=RES.filter(r=>r.date===todayKey&&r.type==='walkin'&&r.st!=='cancelled');
+  const walkNum=todayWalkins.length+1;
+  const now=new Date();
+  const hh=String(now.getHours()).padStart(2,'0');
+  const mm=String(now.getMinutes()).padStart(2,'0');
+  const newRes={
+    date:todayKey,
+    time:`${hh}:${mm}`,
+    name:`워크인 ${walkNum}`,
+    phone:'',
+    pax:0,
+    tables:[tableNum],
+    floor:T1.includes(tableNum)?1:2,
+    ch:'phone',
+    note:'',
+    st:'arrived',
+    merged:false,
+    type:'walkin'
+  };
+  showToast(`${tableNum}번 워크인 ${walkNum} 착석 (${hh}:${mm})`);
+  try{await apiAdd(newRes);}
+  catch(err){showToast('⚠ 저장 실패: '+err.message);}
 }
 function renderModalFP(floor){
   fpFloor=floor;
@@ -756,10 +797,12 @@ function renderModalFP(floor){
 /* ── 통계/목록 렌더 ── */
 function renderStats(){
   const r=fRes();
-  document.getElementById('s-tot').textContent=r.length;
-  document.getElementById('s-pax').textContent=r.reduce((s,x)=>s+x.pax,0);
+  const reservations=r.filter(x=>x.type!=='walkin');
+  const walkins=r.filter(x=>x.type==='walkin');
+  document.getElementById('s-tot').textContent=reservations.length;
+  document.getElementById('s-pax').textContent=reservations.reduce((s,x)=>s+(x.pax||0),0);
   document.getElementById('s-avl').textContent=21-new Set(r.flatMap(x=>x.tables||[])).size;
-  document.getElementById('s-mrg').textContent=r.filter(x=>x.merged).length;
+  document.getElementById('s-walk').textContent=walkins.length;
 }
 function renderList(){
   const list=fRes().sort((a,b)=>a.time.localeCompare(b.time));
@@ -787,8 +830,7 @@ function renderList(){
         <span class="res-time">${r.time}</span>
         <span class="res-tbl${r.merged?' mp':''}${noTbl?' unset':''}">${tbl}</span>
         <span class="res-name">${r.name}</span>
-        <span class="res-pax">${r.pax}명</span>
-        <span class="res-ch ${r.ch==='naver'?'ch-n':'ch-p'}">${r.ch==='naver'?'네이버':'전화'}</span>
+        ${r.type==='walkin'?'<span class="res-walkin">워크인</span>':`<span class="res-pax">${r.pax}명</span><span class="res-ch ${r.ch==='naver'?'ch-n':'ch-p'}">${r.ch==='naver'?'네이버':'전화'}</span>`}
         ${r.note?`<span class="res-note">${r.note}</span>`:''}
       </div>
       <div class="quick-status">${qs}</div>
