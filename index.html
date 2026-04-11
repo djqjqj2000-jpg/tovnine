@@ -964,6 +964,8 @@ async function saveQuick(){
   showToast(`${newRes.name} 예약 추가 완료`);
   try{
     await apiAdd(newRes);
+    await loadDataSilent(); // ★ 시트 반영 대기 — 다음 동명 예약 검사 정확성 보장
+    render();
   }catch(err){
     showToast('저장 실패: '+err.message);
   }finally{
@@ -1073,7 +1075,11 @@ async function saveDetail(){
   origId=null;
   showToast(localId===null?`${localDraft.name} 예약 추가 완료`:`${localDraft.name} 수정 완료`);
   try{
-    if(localId===null){await apiAdd(localDraft);}
+    if(localId===null){
+      await apiAdd(localDraft);
+      await loadDataSilent(); // ★ 시트 반영 대기 — 다음 동명 예약 검사 정확성 보장
+      render();
+    }
     else{await apiUpdate({...localDraft,id:localId});}
     syncNow();
   }catch(err){
