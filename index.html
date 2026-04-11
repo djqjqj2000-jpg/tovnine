@@ -421,6 +421,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-siz
    ★ Google Apps Script API URL
 ══════════════════════════════════════════ */
 const API_URL = 'https://script.google.com/macros/s/AKfycbyn9t9AKORPyeJ6eJ0prpRaVKDDZZBlaNo58TwHukNt6XOp2DIKJ8UKZX9eWsQkBjlNmw/exec';
+const AUTH_TOKEN = 'tovnine_secret_2026_djqjqj2000';
 
 /* ── 테이블 레이아웃 ── */
 const CAPS={'2':6,'3':4,'4':4,'5':4,'6':4,'7':4,'8':4,'9':4,'14':8,'15':8,'2-1':2,'2-2':2,'2-3':2,'2-4':2,'2-5':4,'2-6':4,'11':4,'11-1':2,'12':4,'12-1':2,'13':14};
@@ -465,8 +466,9 @@ function setSyncStatus(state, msg){
 async function apiCall(params, options={}){
   const maxRetries = options.maxRetries !== undefined ? options.maxRetries : 2; // 추가 재시도 횟수
   const timeoutMs = options.timeoutMs || 15000;
-  const url = API_URL+'?'+new URLSearchParams(params).toString();
-
+  const paramsWithToken = {...params, token: AUTH_TOKEN};
+  const url = API_URL+'?'+new URLSearchParams(paramsWithToken).toString();
+  
   let lastError = null;
   for(let attempt=0; attempt<=maxRetries; attempt++){
     try{
