@@ -45,86 +45,84 @@ body{
   -webkit-user-select:none;
 }
 
-/* 전체 컨테이너 - 가로 모드 풀스크린 */
 .app{
   width:100vw;
   height:100vh;
-  padding:16px;
+  padding:20px;
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:14px;
+  gap:18px;
 }
 
-/* ─────── 좌측 패널 ─────── */
 .left-panel{
   display:flex;
   flex-direction:column;
-  gap:12px;
+  gap:16px;
   min-height:0;
 }
 
-/* 헤더 */
 .hdr{
   display:flex;
   align-items:center;
   justify-content:space-between;
   flex-shrink:0;
+  padding:4px 4px 0;
 }
 .hdr h1{
-  font-size:22px;
+  font-size:32px;
   font-weight:700;
   color:var(--text);
   letter-spacing:-0.04em;
   line-height:1.2;
 }
 .hdr p{
-  font-size:11px;
+  font-size:14px;
   color:var(--text2);
-  margin-top:3px;
+  margin-top:4px;
   font-family:'JetBrains Mono',monospace;
 }
 .brand-badge{
-  font-size:10px;
+  font-size:13px;
   color:var(--text3);
   font-family:'JetBrains Mono',monospace;
-  padding:5px 10px;
+  padding:8px 14px;
   background:var(--surface);
   border:1px solid var(--border);
-  border-radius:6px;
+  border-radius:8px;
+  font-weight:600;
 }
 
-/* 차량번호 표시 영역 */
 .plate-section{
   background:var(--surface);
   border:1px solid var(--border);
-  border-radius:10px;
-  padding:14px 16px;
+  border-radius:12px;
+  padding:18px 20px;
   flex-shrink:0;
 }
 .section-label{
-  font-size:10px;
+  font-size:13px;
   color:var(--text3);
-  font-weight:500;
+  font-weight:600;
   text-transform:uppercase;
   letter-spacing:0.05em;
-  margin-bottom:10px;
+  margin-bottom:14px;
   text-align:center;
 }
 .plate-grid{
   display:grid;
   grid-template-columns:repeat(4,1fr);
-  gap:8px;
+  gap:12px;
 }
 .plate-cell{
   aspect-ratio:1;
   background:var(--bg2);
   color:var(--text3);
   border:2px solid var(--border);
-  border-radius:10px;
+  border-radius:12px;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:42px;
+  font-size:80px;
   font-weight:700;
   font-family:'JetBrains Mono',monospace;
   transition:all 0.15s;
@@ -140,58 +138,64 @@ body{
   background:var(--accent-bg);
 }
 
-/* 미리보기 영역 */
 .preview-section{
   background:var(--surface);
   border:1px solid var(--border);
-  border-radius:10px;
-  padding:12px 14px;
+  border-radius:12px;
+  padding:18px 20px;
   flex:1;
   min-height:0;
   display:flex;
   flex-direction:column;
 }
+.preview-section .section-label{
+  text-align:left;
+  margin-bottom:12px;
+}
 .preview-text{
-  font-size:13px;
+  font-size:22px;
   color:var(--text);
   line-height:1.7;
   flex:1;
   display:flex;
   align-items:center;
+  font-weight:500;
 }
 .plate-inline{
   background:var(--accent-bg);
   color:var(--accent);
-  font-weight:600;
-  padding:2px 8px;
-  border-radius:5px;
+  font-weight:700;
+  padding:4px 12px;
+  border-radius:8px;
   font-family:'JetBrains Mono',monospace;
   letter-spacing:0.15em;
   white-space:nowrap;
   display:inline-block;
+  vertical-align:middle;
+  font-size:24px;
 }
 .plate-inline.empty{
   background:var(--bg3);
   color:var(--text3);
+  letter-spacing:0.2em;
 }
 
-/* 방송 시작 버튼 */
 .broadcast-btn{
   width:100%;
-  padding:18px;
+  padding:24px;
   background:var(--accent);
   color:#FFFFFF;
   border:none;
-  border-radius:10px;
+  border-radius:12px;
   font-family:inherit;
-  font-size:17px;
-  font-weight:600;
+  font-size:22px;
+  font-weight:700;
   letter-spacing:-0.01em;
   cursor:pointer;
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:8px;
+  gap:10px;
   flex-shrink:0;
   transition:all 0.15s;
 }
@@ -212,16 +216,15 @@ body{
   cursor:wait;
 }
 .broadcast-icon{
-  font-size:20px;
+  font-size:26px;
   line-height:1;
 }
 
-/* ─────── 우측 패널: 숫자패드 ─────── */
 .right-panel{
   background:var(--surface);
   border:1px solid var(--border);
-  border-radius:10px;
-  padding:14px;
+  border-radius:12px;
+  padding:18px;
   display:flex;
   flex-direction:column;
   min-height:0;
@@ -230,16 +233,16 @@ body{
   display:grid;
   grid-template-columns:repeat(3,1fr);
   grid-template-rows:repeat(4,1fr);
-  gap:10px;
+  gap:12px;
   flex:1;
   min-height:0;
 }
 .key{
   background:var(--bg2);
   border:1px solid var(--border);
-  border-radius:10px;
+  border-radius:12px;
   font-family:'JetBrains Mono',monospace;
-  font-size:32px;
+  font-size:56px;
   font-weight:600;
   color:var(--text);
   cursor:pointer;
@@ -259,7 +262,7 @@ body{
 }
 .key.action{
   font-family:'Pretendard',sans-serif;
-  font-size:14px;
+  font-size:20px;
   font-weight:600;
   color:var(--text2);
 }
@@ -267,7 +270,7 @@ body{
   color:var(--danger);
 }
 .key.action .key-icon{
-  font-size:22px;
+  font-size:36px;
   line-height:1;
 }
 .key:disabled{
@@ -275,17 +278,16 @@ body{
   cursor:not-allowed;
 }
 
-/* 토스트 */
 .toast{
   position:fixed;
-  bottom:24px;
+  bottom:32px;
   left:50%;
   transform:translateX(-50%) translateY(20px);
   background:#1a1a1a;
   color:#FFFFFF;
-  font-size:13px;
-  padding:11px 22px;
-  border-radius:24px;
+  font-size:16px;
+  padding:14px 28px;
+  border-radius:28px;
   opacity:0;
   transition:all 0.25s;
   pointer-events:none;
@@ -293,22 +295,22 @@ body{
   white-space:nowrap;
   font-family:inherit;
   letter-spacing:-0.01em;
+  font-weight:500;
 }
 .toast.show{
   opacity:1;
   transform:translateX(-50%) translateY(0);
 }
 
-/* 작은 화면 대응 */
-@media (max-height:500px){
-  .app{padding:10px;gap:10px;}
-  .hdr h1{font-size:18px;}
-  .plate-cell{font-size:32px;}
-  .key{font-size:26px;}
-  .broadcast-btn{padding:14px;font-size:15px;}
+@media (max-height:600px){
+  .app{padding:12px;gap:12px;}
+  .hdr h1{font-size:24px;}
+  .plate-cell{font-size:56px;}
+  .key{font-size:40px;}
+  .preview-text{font-size:16px;}
+  .broadcast-btn{padding:16px;font-size:17px;}
 }
 
-/* 매우 좁은 가로 화면(세로 모드 등) - 위아래로 전환 */
 @media (orientation:portrait){
   .app{
     grid-template-columns:1fr;
@@ -321,7 +323,6 @@ body{
 
 <div class="app">
 
-  <!-- ═══════ 좌측: 정보 영역 ═══════ -->
   <div class="left-panel">
     
     <div class="hdr">
@@ -343,9 +344,9 @@ body{
     </div>
 
     <div class="preview-section">
-      <div class="section-label" style="text-align:left;">방송 미리보기</div>
+      <div class="section-label">방송 미리보기</div>
       <div class="preview-text">
-        토브나인을 찾아주신 고객님께 안내드립니다. 차량번호 <span class="plate-inline empty" id="plate-inline">_ _ _ _</span> 차주님, 잠시 차량 이동을 부탁드립니다. 오늘도 토브나인에서 행복하세요.
+        <span>토브나인을 찾아주신 고객님께 안내드립니다. 차량번호 <span class="plate-inline empty" id="plate-inline">_ _ _ _</span> 차주님, 잠시 차량 이동을 부탁드립니다. 오늘도 토브나인에서 행복하세요.</span>
       </div>
     </div>
 
@@ -356,7 +357,6 @@ body{
 
   </div>
 
-  <!-- ═══════ 우측: 숫자패드 ═══════ -->
   <div class="right-panel">
     <div class="keypad" id="keypad">
       <button class="key" onclick="pressKey('1')">1</button>
@@ -381,21 +381,14 @@ body{
 <div class="toast" id="toast"></div>
 
 <script>
-/* ══════════════════════════════════════════
-   설정값
-══════════════════════════════════════════ */
-// 차량번호를 두 번 반복 재생할지 여부
-// false = 한 번만, true = 두 번 반복
 const REPEAT_NUMBERS = false;
 
-// 음원 사이 텀(ms)
-const GAP_AFTER_CHIME = 300;       // 차임벨 → 인트로
-const GAP_AFTER_INTRO = 200;       // 인트로 → 첫 숫자
-const GAP_BETWEEN_DIGITS = 200;    // 숫자 간 텀
-const GAP_BEFORE_REPEAT = 600;     // 첫 번째 숫자 그룹 → 두 번째 숫자 그룹
-const GAP_BEFORE_OUTRO = 300;      // 마지막 숫자 → 아웃트로
+const GAP_AFTER_CHIME = 0;
+const GAP_AFTER_INTRO = 0;
+const GAP_BETWEEN_DIGITS = 0;
+const GAP_BEFORE_REPEAT = 0;
+const GAP_BEFORE_OUTRO = 0;
 
-// 음원 경로 (broadcast.html 위치 기준 상대 경로)
 const AUDIO = {
   chime: 'audio/chime.mp3',
   intro: 'audio/intro.mp3',
@@ -412,17 +405,10 @@ const AUDIO = {
   '9': 'audio/9.mp3',
 };
 
-/* ══════════════════════════════════════════
-   상태
-══════════════════════════════════════════ */
-let plateDigits = ['', '', '', ''];  // 입력된 4자리
-let isPlaying = false;                // 재생 중 여부
-let audioCache = {};                  // 미리 로드한 Audio 객체
+let plateDigits = ['', '', '', ''];
+let isPlaying = false;
+let audioCache = {};
 
-/* ══════════════════════════════════════════
-   오디오 사전 로드 (페이지 진입 즉시)
-   - 첫 재생 지연을 줄이기 위해 모든 음원을 미리 다운로드
-══════════════════════════════════════════ */
 function preloadAudio(){
   Object.entries(AUDIO).forEach(([key, path]) => {
     const audio = new Audio(path);
@@ -432,16 +418,10 @@ function preloadAudio(){
   });
 }
 
-/* ══════════════════════════════════════════
-   숫자패드 입력
-══════════════════════════════════════════ */
 function pressKey(digit){
   if(isPlaying) return;
-  
-  // 4자리 다 찼으면 무시
   const filledIdx = plateDigits.findIndex(d => d === '');
   if(filledIdx === -1) return;
-  
   plateDigits[filledIdx] = digit;
   renderPlate();
   updateBroadcastBtn();
@@ -449,8 +429,6 @@ function pressKey(digit){
 
 function pressBackspace(){
   if(isPlaying) return;
-  
-  // 마지막으로 채워진 자리 찾아서 지우기
   for(let i = plateDigits.length - 1; i >= 0; i--){
     if(plateDigits[i] !== ''){
       plateDigits[i] = '';
@@ -468,11 +446,7 @@ function pressClear(){
   updateBroadcastBtn();
 }
 
-/* ══════════════════════════════════════════
-   화면 갱신
-══════════════════════════════════════════ */
 function renderPlate(){
-  // 차량번호 4칸
   const cells = document.querySelectorAll('.plate-cell');
   const nextIdx = plateDigits.findIndex(d => d === '');
   
@@ -486,14 +460,12 @@ function renderPlate(){
     }
   });
   
-  // 미리보기 영역의 차량번호 표시
   const inline = document.getElementById('plate-inline');
   const allFilled = plateDigits.every(d => d !== '');
   if(allFilled){
     inline.textContent = plateDigits.join(' ');
     inline.classList.remove('empty');
   } else {
-    // 빈 자리는 _ 로 표시
     const display = plateDigits.map(d => d === '' ? '_' : d).join(' ');
     inline.textContent = display;
     inline.classList.add('empty');
@@ -506,9 +478,6 @@ function updateBroadcastBtn(){
   btn.disabled = !allFilled || isPlaying;
 }
 
-/* ══════════════════════════════════════════
-   방송 재생
-══════════════════════════════════════════ */
 async function startBroadcast(){
   if(isPlaying) return;
   if(plateDigits.some(d => d === '')) return;
@@ -517,18 +486,14 @@ async function startBroadcast(){
   updatePlayingUI(true);
   
   try{
-    // 1. 차임벨
     await playAudio('chime');
     await wait(GAP_AFTER_CHIME);
     
-    // 2. 인트로 멘트
     await playAudio('intro');
     await wait(GAP_AFTER_INTRO);
     
-    // 3. 차량번호 4자리
     await playDigits();
     
-    // 4. 두 번 반복 옵션
     if(REPEAT_NUMBERS){
       await wait(GAP_BEFORE_REPEAT);
       await playDigits();
@@ -536,12 +501,10 @@ async function startBroadcast(){
     
     await wait(GAP_BEFORE_OUTRO);
     
-    // 5. 아웃트로 멘트
     await playAudio('outro');
     
     showToast('방송 완료');
     
-    // 자동으로 차량번호 초기화 (다음 방송 준비)
     setTimeout(() => {
       plateDigits = ['', '', '', ''];
       renderPlate();
@@ -575,13 +538,11 @@ function playAudio(key){
       return;
     }
     
-    // 같은 인스턴스를 재사용하지 않고 새로 만들어 재생
-    // (캐시는 다운로드용, 재생은 별도 인스턴스가 안전)
     const audio = new Audio(cached.src);
     audio.volume = 1.0;
     
     audio.addEventListener('ended', () => resolve(), {once:true});
-    audio.addEventListener('error', (e) => {
+    audio.addEventListener('error', () => {
       reject(new Error('음원 재생 오류: ' + key));
     }, {once:true});
     
@@ -604,7 +565,6 @@ function updatePlayingUI(playing){
     btn.classList.add('playing');
     btn.disabled = true;
     text.textContent = '방송 중...';
-    // 숫자패드 비활성화 (시각적 피드백)
     keypad.querySelectorAll('button').forEach(b => b.disabled = true);
   } else {
     btn.classList.remove('playing');
@@ -613,9 +573,6 @@ function updatePlayingUI(playing){
   }
 }
 
-/* ══════════════════════════════════════════
-   토스트
-══════════════════════════════════════════ */
 function showToast(msg){
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -623,9 +580,6 @@ function showToast(msg){
   setTimeout(() => t.classList.remove('show'), 2200);
 }
 
-/* ══════════════════════════════════════════
-   키보드 입력 지원 (PC에서 테스트 시 편의)
-══════════════════════════════════════════ */
 document.addEventListener('keydown', (e) => {
   if(isPlaying) return;
   
@@ -641,23 +595,18 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-/* ══════════════════════════════════════════
-   초기화
-══════════════════════════════════════════ */
 preloadAudio();
 renderPlate();
 updateBroadcastBtn();
 
-// 화면 자동 잠금 방지 시도 (Wake Lock API)
 async function preventScreenLock(){
   if('wakeLock' in navigator){
     try{
       await navigator.wakeLock.request('screen');
-    }catch(e){/* 무시 — 권한 없거나 미지원 */}
+    }catch(e){}
   }
 }
 preventScreenLock();
-// 사용자 인터랙션 후 다시 시도 (어떤 브라우저는 첫 인터랙션 후에만 허용)
 document.addEventListener('click', preventScreenLock, {once:true});
 
 </script>
