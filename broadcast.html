@@ -23,9 +23,7 @@
   --accent-bg:#EAE9F7;
   --accent-bg2:#D8D6F0;
   --danger:#B91C1C;
-  --danger-bg:#FEE4E4;
   --success:#0E7C5A;
-  --success-bg:#E0F2EA;
 }
 html, body{
   width:100%;
@@ -34,7 +32,6 @@ html, body{
 }
 body{
   font-family:'Pretendard','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-  font-size:14px;
   background:var(--bg2);
   color:var(--text);
   -webkit-tap-highlight-color:transparent;
@@ -43,22 +40,33 @@ body{
   letter-spacing:-0.01em;
   user-select:none;
   -webkit-user-select:none;
+  /* ★ 핵심: 화면 높이에 따라 모든 글씨 크기가 자동 조정 
+     1vh = 화면 높이의 1%. 16:10 가로 태블릿(800px 높이)이면 1vh = 8px */
 }
 
+/* ──────────────────────────────────
+   ★ 핵심: 100% 높이 안에 모든 게 들어가도록 강제
+   - .app: 100vh 고정, overflow 금지
+   - 좌측: flex로 공간 배분
+   - 우측 키패드: grid 1fr*4행 → 자동 비율
+────────────────────────────────── */
 .app{
   width:100vw;
   height:100vh;
-  padding:20px;
+  height:100dvh; /* 모바일 브라우저 주소창 고려 */
+  padding:1.5vh 1.5vw;
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:18px;
+  gap:1.2vw;
+  overflow:hidden;
 }
 
 .left-panel{
   display:flex;
   flex-direction:column;
-  gap:16px;
+  gap:1.2vh;
   min-height:0;
+  overflow:hidden;
 }
 
 .hdr{
@@ -66,55 +74,57 @@ body{
   align-items:center;
   justify-content:space-between;
   flex-shrink:0;
-  padding:4px 4px 0;
+  padding:0 0.5vw;
 }
 .hdr h1{
-  font-size:32px;
+  font-size:clamp(18px, 3.5vh, 32px);
   font-weight:700;
   color:var(--text);
   letter-spacing:-0.04em;
   line-height:1.2;
 }
 .hdr p{
-  font-size:14px;
+  font-size:clamp(10px, 1.5vh, 14px);
   color:var(--text2);
-  margin-top:4px;
+  margin-top:0.3vh;
   font-family:'JetBrains Mono',monospace;
 }
 .brand-badge{
-  font-size:13px;
+  font-size:clamp(10px, 1.5vh, 13px);
   color:var(--text3);
   font-family:'JetBrains Mono',monospace;
-  padding:8px 14px;
+  padding:0.8vh 1.2vw;
   background:var(--surface);
   border:1px solid var(--border);
   border-radius:8px;
   font-weight:600;
 }
 
+/* 차량번호 입력 영역 — 화면 높이 기준으로 자동 축소 */
 .plate-section{
   background:var(--surface);
   border:1px solid var(--border);
   border-radius:12px;
-  padding:18px 20px;
+  padding:1.5vh 1.5vw;
   flex-shrink:0;
 }
 .section-label{
-  font-size:13px;
+  font-size:clamp(9px, 1.3vh, 13px);
   color:var(--text3);
   font-weight:600;
   text-transform:uppercase;
   letter-spacing:0.05em;
-  margin-bottom:14px;
+  margin-bottom:1vh;
   text-align:center;
 }
 .plate-grid{
   display:grid;
   grid-template-columns:repeat(4,1fr);
-  gap:12px;
+  gap:0.8vw;
 }
 .plate-cell{
-  aspect-ratio:1;
+  /* aspect-ratio 제거 - 대신 고정 높이로 제어 */
+  height:clamp(55px, 11vh, 110px);
   background:var(--bg2);
   color:var(--text3);
   border:2px solid var(--border);
@@ -122,7 +132,7 @@ body{
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:80px;
+  font-size:clamp(36px, 8vh, 72px);
   font-weight:700;
   font-family:'JetBrains Mono',monospace;
   transition:all 0.15s;
@@ -138,41 +148,44 @@ body{
   background:var(--accent-bg);
 }
 
+/* 미리보기 — flex로 남는 공간 차지하되, 너무 작아지지 않게 최소 높이 */
 .preview-section{
   background:var(--surface);
   border:1px solid var(--border);
   border-radius:12px;
-  padding:18px 20px;
+  padding:1.5vh 1.5vw;
   flex:1;
-  min-height:0;
+  min-height:60px;
   display:flex;
   flex-direction:column;
+  overflow:hidden;
 }
 .preview-section .section-label{
   text-align:left;
-  margin-bottom:12px;
+  margin-bottom:1vh;
 }
 .preview-text{
-  font-size:22px;
+  font-size:clamp(13px, 2.2vh, 22px);
   color:var(--text);
-  line-height:1.7;
+  line-height:1.6;
   flex:1;
   display:flex;
   align-items:center;
   font-weight:500;
+  overflow:hidden;
 }
 .plate-inline{
   background:var(--accent-bg);
   color:var(--accent);
   font-weight:700;
-  padding:4px 12px;
+  padding:0.3vh 0.8vw;
   border-radius:8px;
   font-family:'JetBrains Mono',monospace;
   letter-spacing:0.15em;
   white-space:nowrap;
   display:inline-block;
   vertical-align:middle;
-  font-size:24px;
+  font-size:clamp(14px, 2.4vh, 24px);
 }
 .plate-inline.empty{
   background:var(--bg3);
@@ -180,31 +193,28 @@ body{
   letter-spacing:0.2em;
 }
 
+/* 방송 시작 버튼 — 무조건 보이도록 고정 */
 .broadcast-btn{
   width:100%;
-  padding:24px;
+  padding:clamp(14px, 2.5vh, 24px);
   background:var(--accent);
   color:#FFFFFF;
   border:none;
   border-radius:12px;
   font-family:inherit;
-  font-size:22px;
+  font-size:clamp(15px, 2.5vh, 22px);
   font-weight:700;
   letter-spacing:-0.01em;
   cursor:pointer;
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:10px;
+  gap:8px;
   flex-shrink:0;
   transition:all 0.15s;
 }
-.broadcast-btn:hover{
-  background:var(--accent-soft);
-}
-.broadcast-btn:active{
-  transform:scale(0.98);
-}
+.broadcast-btn:hover{background:var(--accent-soft);}
+.broadcast-btn:active{transform:scale(0.98);}
 .broadcast-btn:disabled{
   background:var(--text3);
   cursor:not-allowed;
@@ -216,24 +226,26 @@ body{
   cursor:wait;
 }
 .broadcast-icon{
-  font-size:26px;
+  font-size:clamp(18px, 3vh, 26px);
   line-height:1;
 }
 
+/* ──── 우측 패널: 숫자패드 ──── */
 .right-panel{
   background:var(--surface);
   border:1px solid var(--border);
   border-radius:12px;
-  padding:18px;
+  padding:1.2vh 1vw;
   display:flex;
   flex-direction:column;
   min-height:0;
+  overflow:hidden;
 }
 .keypad{
   display:grid;
   grid-template-columns:repeat(3,1fr);
   grid-template-rows:repeat(4,1fr);
-  gap:12px;
+  gap:0.8vh;
   flex:1;
   min-height:0;
 }
@@ -242,7 +254,7 @@ body{
   border:1px solid var(--border);
   border-radius:12px;
   font-family:'JetBrains Mono',monospace;
-  font-size:56px;
+  font-size:clamp(28px, 6vh, 56px);
   font-weight:600;
   color:var(--text);
   cursor:pointer;
@@ -250,6 +262,8 @@ body{
   display:flex;
   align-items:center;
   justify-content:center;
+  min-height:0;
+  padding:0;
 }
 .key:hover{
   background:var(--bg3);
@@ -262,15 +276,13 @@ body{
 }
 .key.action{
   font-family:'Pretendard',sans-serif;
-  font-size:20px;
+  font-size:clamp(13px, 2.2vh, 20px);
   font-weight:600;
   color:var(--text2);
 }
-.key.action.danger{
-  color:var(--danger);
-}
+.key.action.danger{color:var(--danger);}
 .key.action .key-icon{
-  font-size:36px;
+  font-size:clamp(20px, 4vh, 36px);
   line-height:1;
 }
 .key:disabled{
@@ -280,13 +292,13 @@ body{
 
 .toast{
   position:fixed;
-  bottom:32px;
+  bottom:3vh;
   left:50%;
   transform:translateX(-50%) translateY(20px);
   background:#1a1a1a;
   color:#FFFFFF;
-  font-size:16px;
-  padding:14px 28px;
+  font-size:clamp(12px, 2vh, 16px);
+  padding:1.2vh 2.5vw;
   border-radius:28px;
   opacity:0;
   transition:all 0.25s;
@@ -302,19 +314,15 @@ body{
   transform:translateX(-50%) translateY(0);
 }
 
-@media (max-height:600px){
-  .app{padding:12px;gap:12px;}
-  .hdr h1{font-size:24px;}
-  .plate-cell{font-size:56px;}
-  .key{font-size:40px;}
-  .preview-text{font-size:16px;}
-  .broadcast-btn{padding:16px;font-size:17px;}
-}
-
+/* 세로 모드(orientation:portrait) 대비 — 기본은 가로지만 안전장치 */
 @media (orientation:portrait){
   .app{
     grid-template-columns:1fr;
     grid-template-rows:auto 1fr;
+  }
+  .plate-cell{
+    height:clamp(50px, 9vh, 90px);
+    font-size:clamp(32px, 6vh, 56px);
   }
 }
 </style>
@@ -381,16 +389,12 @@ body{
 <div class="toast" id="toast"></div>
 
 <script>
-// 차량번호 두 번 반복 여부 (false: 한번, true: 두번)
 const REPEAT_NUMBERS = true;
 
-// 음원 꼬리(끝부분) 자르기 — ms 단위
 const TRIM_CHIME = 200;
 const TRIM_INTRO = 350;
 const TRIM_DIGIT = 280;
 const TRIM_LAST_DIGIT = 200;
-// 두 번 반복 시 첫 그룹의 마지막 숫자 끝 자르기 (= 그룹 사이 호흡)
-// 작을수록 그룹 사이 텀이 김. 0 ~ 200 정도가 자연스러움
 const TRIM_LAST_DIGIT_FIRST_GROUP = 100;
 const TRIM_OUTRO = 0;
 
@@ -495,9 +499,7 @@ async function startBroadcast(){
     await playAudioTrimmed('intro', TRIM_INTRO);
     
     if(REPEAT_NUMBERS){
-      // 첫 번째 그룹 - 마지막 숫자에 호흡 줌
       await playDigits(true);
-      // 두 번째 그룹 - 정상 마지막 자르기
       await playDigits(false);
     } else {
       await playDigits(false);
@@ -523,12 +525,6 @@ async function startBroadcast(){
   }
 }
 
-/**
- * 차량번호 4자리 재생
- * @param {boolean} isFirstGroup - 두 번 반복의 첫 그룹인지 여부
- *   true: 마지막 숫자 끝에 호흡 줌(그룹 사이 자연스러운 텀)
- *   false: 평소대로 자르기
- */
 async function playDigits(isFirstGroup){
   for(let i = 0; i < plateDigits.length; i++){
     const isLast = (i === plateDigits.length - 1);
@@ -542,9 +538,6 @@ async function playDigits(isFirstGroup){
   }
 }
 
-/**
- * 음원을 재생하되, 끝나기 trimMs 밀리초 전에 종료(=다음 음원 시작 가능)
- */
 function playAudioTrimmed(key, trimMs){
   return new Promise((resolve, reject) => {
     const cached = audioCache[key];
