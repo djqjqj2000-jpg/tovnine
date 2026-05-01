@@ -381,13 +381,18 @@ body{
 <div class="toast" id="toast"></div>
 
 <script>
+// 차량번호 두 번 반복 여부 (false: 한번, true: 두번)
 const REPEAT_NUMBERS = false;
 
-const GAP_AFTER_CHIME = 0;
-const GAP_AFTER_INTRO = 0;
-const GAP_BETWEEN_DIGITS = 0;
-const GAP_BEFORE_REPEAT = 0;
-const GAP_BEFORE_OUTRO = 0;
+// 음원 꼬리(끝부분) 자르기 — ms 단위
+// 값이 클수록 다음 음원이 더 일찍 시작됨 (간격이 짧아짐)
+// 음원의 무음 구간만큼만 자르는 게 핵심. 너무 크면 발음이 잘림.
+const TRIM_CHIME = 200;       // 차임벨 끝
+const TRIM_INTRO = 350;       // 인트로 멘트 끝
+const TRIM_DIGIT = 280;       // 각 숫자 끝 (예: "삼" 의 끝)
+const TRIM_LAST_DIGIT = 200;  // 마지막 숫자 끝 (아웃트로로 넘어가기 전)
+const TRIM_REPEAT_GAP = 100;  // 두 번 반복 모드에서 첫 그룹 끝
+const TRIM_OUTRO = 0;         // 아웃트로는 끝까지 자연스럽게
 
 const AUDIO = {
   chime: 'audio/chime.mp3',
@@ -486,22 +491,22 @@ async function startBroadcast(){
   updatePlayingUI(true);
   
   try{
-    await playAudio('chime');
-    await wait(GAP_AFTER_CHIME);
+    // 1. 차임벨 (끝 200ms 잘라냄)
+    await playAudioTrimmed('chime', TRIM_CHIME);
     
-    await playAudio('intro');
-    await wait(GAP_AFTER_INTRO);
+    // 2. 인트로 (끝 350ms 잘라냄)
+    await playAudioTrimmed('intro', TRIM_INTRO);
     
+    // 3. 차량번호 4자리
     await playDigits();
     
+    // 4. 두 번 반복 옵션
     if(REPEAT_NUMBERS){
-      await wait(GAP_BEFORE_REPEAT);
       await playDigits();
     }
     
-    await wait(GAP_BEFORE_OUTRO);
-    
-    await playAudio('outro');
+    // 5. 아웃트로 (끝까지)
+    await playAudioTrimmed('outro', TRIM_OUTRO);
     
     showToast('방송 완료');
     
@@ -523,14 +528,18 @@ async function startBroadcast(){
 
 async function playDigits(){
   for(let i = 0; i < plateDigits.length; i++){
-    await playAudio(plateDigits[i]);
-    if(i < plateDigits.length - 1){
-      await wait(GAP_BETWEEN_DIGITS);
-    }
+    const isLast = (i === plateDigits.length - 1);
+    // 마지막 숫자만 더 적게 자름 (다음이 아웃트로라 자연스러운 호흡 필요)
+    const trim = isLast ? TRIM_LAST_DIGIT : TRIM_DIGIT;
+    await playAudioTrimmed(plateDigits[i], trim);
   }
 }
 
-function playAudio(key){
+/**
+ * 음원을 재생하되, 끝나기 trimMs 밀리초 전에 종료(=다음 음원 시작 가능)
+ * trimMs=0 이면 'ended' 이벤트까지 정상 대기
+ */
+function playAudioTrimmed(key, trimMs){
   return new Promise((resolve, reject) => {
     const cached = audioCache[key];
     if(!cached){
@@ -541,19 +550,48 @@ function playAudio(key){
     const audio = new Audio(cached.src);
     audio.volume = 1.0;
     
-    audio.addEventListener('ended', () => resolve(), {once:true});
+    let resolved = false;
+    let trimTimer = null;
+    
+    const finish = () => {
+      if(resolved) return;
+      resolved = true;
+      if(trimTimer) clearTimeout(trimTimer);
+      // 음원이 계속 재생되도록 두되, Promise만 먼저 resolve
+      // (다음 음원이 시작되면서 자연스럽게 겹침)
+      resolve();
+    };
+    
+    // trim이 0이면 정상 'ended' 대기
+    if(trimMs <= 0){
+      audio.addEventListener('ended', finish, {once:true});
+    } else {
+      // 음원 길이 알아낸 후 (전체 길이 - trim) 시점에 다음으로 넘김
+      audio.addEventListener('loadedmetadata', () => {
+        const dur = audio.duration * 1000; // ms
+        const trigger = Math.max(0, dur - trimMs);
+        trimTimer = setTimeout(finish, trigger);
+      }, {once:true});
+      // 안전장치: ended가 먼저 발생해도 finish
+      audio.addEventListener('ended', finish, {once:true});
+    }
+    
     audio.addEventListener('error', () => {
-      reject(new Error('음원 재생 오류: ' + key));
+      if(!resolved){
+        resolved = true;
+        if(trimTimer) clearTimeout(trimTimer);
+        reject(new Error('음원 재생 오류: ' + key));
+      }
     }, {once:true});
     
     audio.play().catch(err => {
-      reject(new Error('재생 권한 문제: ' + err.message));
+      if(!resolved){
+        resolved = true;
+        if(trimTimer) clearTimeout(trimTimer);
+        reject(new Error('재생 권한 문제: ' + err.message));
+      }
     });
   });
-}
-
-function wait(ms){
-  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 function updatePlayingUI(playing){
