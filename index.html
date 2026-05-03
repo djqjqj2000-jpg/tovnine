@@ -216,9 +216,10 @@ body{
 .res-tbl{font-size:12px;padding:4px 10px;border-radius:6px;background:var(--vacant-bg);color:#0369A1;border:1.5px solid var(--vacant);white-space:nowrap;font-weight:700;font-family:'JetBrains Mono',monospace;}
 .res-tbl.mp{background:var(--vacant-bg);color:#0369A1;border-color:var(--vacant);}
 .res-tbl.unset{background:var(--warn-bg);color:var(--warn);border-color:var(--warn);}
-.res-walkin{font-size:12px;padding:4px 9px;border-radius:6px;background:var(--accent);color:#fff;font-weight:700;white-space:nowrap;letter-spacing:0.02em;}
+.res-walkin{font-size:11px;padding:3px 8px;border-radius:6px;background:transparent;color:var(--accent);border:1px solid var(--accent);font-weight:600;white-space:nowrap;letter-spacing:0.02em;}
 .res-walkin .walkin-num{font-size:10px;font-weight:400;opacity:0.7;}
 .res-name{font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100px;letter-spacing:-0.02em;}
+.res-name .name-num{font-size:11px;font-weight:400;color:var(--text3);margin-left:1px;}
 .res-pax{font-size:13px;color:var(--accent);white-space:nowrap;font-family:'JetBrains Mono',monospace;font-weight:700;}
 .res-ch{font-size:11px;padding:3px 8px;border-radius:6px;font-weight:600;}
 .ch-n{background:#E8F5E9;color:#1EC800;border:1px solid #A5D6A7;}
@@ -935,8 +936,8 @@ function renderList(){
       <div class="res-item-left">
         <span class="res-time">${r.time}</span>
         <span class="res-tbl${r.merged?' mp':''}${noTbl?' unset':''}">${tbl}</span>
-        <span class="res-name">${r.name}</span>
-        ${r.type==='walkin'?`<span class="res-walkin">워크인<span class="walkin-num">${(r.name.match(/\d+$/)||[''])[0]}</span></span>`:`<span class="res-pax">${r.pax}명</span><span class="res-ch ${r.ch==='naver'?'ch-n':'ch-p'}">${r.ch==='naver'?'네이버':'전화'}</span>`}
+        <span class="res-name">${r.type==='walkin'?`워크인<span class="name-num">${(r.name.match(/\d+$/)||[''])[0]}</span>`:r.name}</span>
+        ${r.type==='walkin'?'<span class="res-walkin">워크인</span>':`<span class="res-pax">${r.pax}명</span><span class="res-ch ${r.ch==='naver'?'ch-n':'ch-p'}">${r.ch==='naver'?'네이버':'전화'}</span>`}
         ${r.note?`<span class="res-note">${r.note}</span>`:''}
       </div>
       <div class="quick-status">${qs}</div>
