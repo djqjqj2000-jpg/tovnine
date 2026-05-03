@@ -125,10 +125,11 @@ body{
 
 /* ── 통계 ── */
 .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;}
-.stat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;transition:border-color 0.15s;}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 14px;transition:border-color 0.15s;}
 .stat:hover{border-color:var(--border-strong);}
 .stat-lbl{font-size:10px;color:var(--text2);margin-bottom:3px;text-transform:uppercase;letter-spacing:0.05em;font-weight:500;}
 .stat-val{font-size:24px;font-weight:700;color:var(--text);line-height:1;letter-spacing:-0.04em;font-feature-settings:'tnum' 1;}
+.stat-unit{font-size:12px;font-weight:500;color:var(--text3);margin-left:2px;letter-spacing:0;}
 .stat-sub{font-size:10px;color:var(--text3);margin-top:3px;font-family:'JetBrains Mono',monospace;}
 
 /* ── 세션 탭 ── */
@@ -200,7 +201,11 @@ body{
 .add-btn:active{background:var(--accent);}
 .guide-row{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
 .guide-chip{font-size:10px;padding:3px 9px;border-radius:6px;border:1px solid var(--border);color:var(--text3);background:var(--bg2);font-family:'JetBrains Mono',monospace;}
-.res-list{display:flex;flex-direction:column;gap:6px;}
+.res-list{display:flex;flex-direction:column;gap:6px;max-height:45vh;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-right:2px;}
+.res-list::-webkit-scrollbar{width:4px;}
+.res-list::-webkit-scrollbar-track{background:transparent;}
+.res-list::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:4px;}
+.res-list::-webkit-scrollbar-thumb:hover{background:var(--text3);}
 .res-item{border:1px solid var(--border);border-radius:10px;padding:10px 13px;display:flex;align-items:center;gap:8px;background:var(--surface);transition:all 0.15s;}
 .res-item:hover{border-color:var(--border-strong);}
 .res-item.st-arrived{background:var(--accent-bg);border-color:var(--accent-bg2);}
@@ -422,10 +427,10 @@ body{
   </div>
 
   <div class="stats">
-    <div class="stat"><div class="stat-lbl">오늘 예약</div><div class="stat-val" id="s-tot">-</div><div class="stat-sub">건</div></div>
-    <div class="stat"><div class="stat-lbl">예약 인원</div><div class="stat-val" id="s-pax">-</div><div class="stat-sub">명</div></div>
-    <div class="stat"><div class="stat-lbl">잔여 테이블</div><div class="stat-val" id="s-avl">-</div><div class="stat-sub">/ 21개</div></div>
-    <div class="stat"><div class="stat-lbl">워크인</div><div class="stat-val" id="s-walk">-</div><div class="stat-sub">건</div></div>
+    <div class="stat"><div class="stat-lbl">오늘 예약</div><div class="stat-val" id="s-tot">-</div></div>
+    <div class="stat"><div class="stat-lbl">예약 인원</div><div class="stat-val" id="s-pax">-</div></div>
+    <div class="stat"><div class="stat-lbl">잔여 테이블</div><div class="stat-val" id="s-avl">-</div></div>
+    <div class="stat"><div class="stat-lbl">워크인</div><div class="stat-val" id="s-walk">-</div></div>
   </div>
 
   <div class="toolbar">
@@ -540,7 +545,6 @@ const MONTHS_KO=['1월','2월','3월','4월','5월','6월','7월','8월','9월',
 
 /* ── 상태 변수 ── */
 let RES=[];
-let pendingUpdates=new Map(); // ★ 보호 목록: id → {fields, timestamp}
 let viewDate=new Date(TODAY);
 let calViewYear=TODAY.getFullYear(), calViewMonth=TODAY.getMonth();
 let sess='all', hlResId=null;
@@ -634,21 +638,13 @@ async function loadData(){
 /* ★ 자동 동기화 전용 — 실패해도 토스트 안 띄움 (조용히 다음 시도 대기) */
 async function loadDataAuto(){
   try{
-    const data=await apiCall({action:'getAll'}, {maxRetries:1});
-    let freshRES=data.reservations||[];
-    // ★ 보호 목록 병합 (loadDataSilent과 동일)
-    if(pendingUpdates.size>0){
-      const now=Date.now();
-      for(const [id, info] of pendingUpdates){
-        if(now-info.timestamp>30000){pendingUpdates.delete(id);continue;}
-        const freshIdx=freshRES.findIndex(r=>r.id===id);
-        if(freshIdx>=0){freshRES[freshIdx]={...freshRES[freshIdx],...info.fields};}
-      }
-    }
-    RES=freshRES;
+    const data=await apiCall({action:'getAll'}, {maxRetries:1}); // 자동은 재시도 1번만
+    RES=data.reservations||[];
     setSyncStatus('ok',`마지막 동기화: ${new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})}`);
     render();
   }catch(e){
+    // 자동 동기화는 조용히 실패 — 다음 1분 후 재시도
+    // 단, 동기화 표시줄에는 가볍게 표시 (사용자가 인지할 수 있게)
     setSyncStatus('error','일시적 연결 지연 — 자동 재시도 중');
   }
 }
@@ -657,21 +653,7 @@ async function loadDataAuto(){
 async function loadDataSilent(){
   try{
     const data=await apiCall({action:'getAll'}, {maxRetries:1});
-    let freshRES=data.reservations||[];
-    // ★ 보호 목록에 있는 항목은 로컬 값을 유지 (시트 반영 지연 보호)
-    if(pendingUpdates.size>0){
-      const now=Date.now();
-      for(const [id, info] of pendingUpdates){
-        // 30초 초과된 보호는 해제 (안전장치)
-        if(now-info.timestamp>30000){pendingUpdates.delete(id);continue;}
-        const freshIdx=freshRES.findIndex(r=>r.id===id);
-        if(freshIdx>=0){
-          // 시트 데이터에 보호된 필드를 덮어씀 (로컬 우선)
-          freshRES[freshIdx]={...freshRES[freshIdx],...info.fields};
-        }
-      }
-    }
-    RES=freshRES;
+    RES=data.reservations||[];
     setSyncStatus('ok',`마지막 동기화: ${new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})}`);
   }catch(e){/* 조용히 실패 — 기존 로컬 데이터 유지 */}
 }
@@ -729,12 +711,8 @@ async function apiUpdateField(id, fields){
     r=RES.find(x=>x.id===id);
   }
   if(!r)throw new Error('예약을 찾을 수 없습니다 (id: '+id+')');
-  // ★ 보호 목록에 등록 — 동기화 시 이 필드는 로컬 값 우선
-  pendingUpdates.set(id, {fields:{...fields}, timestamp:Date.now()});
   const updated={...r,...fields};
   await apiUpdate(updated);
-  // ★ 저장 성공 후 5초 뒤 보호 해제 (시트 반영 대기)
-  setTimeout(()=>{pendingUpdates.delete(id);}, 5000);
 }
 
 function showLoading(msg='처리 중...'){
@@ -926,10 +904,10 @@ function renderStats(){
   const r=fRes();
   const reservations=r.filter(x=>x.type!=='walkin');
   const walkins=r.filter(x=>x.type==='walkin');
-  document.getElementById('s-tot').textContent=reservations.length;
-  document.getElementById('s-pax').textContent=reservations.reduce((s,x)=>s+(x.pax||0),0);
-  document.getElementById('s-avl').textContent=21-new Set(r.flatMap(x=>x.tables||[])).size;
-  document.getElementById('s-walk').textContent=walkins.length;
+  document.getElementById('s-tot').innerHTML=reservations.length+'<span class="stat-unit">건</span>';
+  document.getElementById('s-pax').innerHTML=reservations.reduce((s,x)=>s+(x.pax||0),0)+'<span class="stat-unit">명</span>';
+  document.getElementById('s-avl').innerHTML=(21-new Set(r.flatMap(x=>x.tables||[])).size)+'<span class="stat-unit">/21</span>';
+  document.getElementById('s-walk').innerHTML=walkins.length+'<span class="stat-unit">건</span>';
 }
 function renderList(){
   const list=fRes().sort((a,b)=>a.time.localeCompare(b.time));
@@ -970,14 +948,14 @@ function render(){renderStats();renderDashFP();renderList();}
 async function quickArrive(id,e){
   e.stopPropagation();
   const r=RES.find(x=>x.id===id);if(!r)return;
-  try{await apiUpdateField(id,{st:'arrived'});showToast(`${r.name} 착석 처리 완료`);}
+  try{await apiUpdateField(id,{st:'arrived'});showToast(`${r.name} 착석 처리 완료`);syncNow();}
   catch(err){showToast('⚠ 처리 실패: '+err.message);}
 }
 async function cancelArrive(id,e){
   e.stopPropagation();
   const r=RES.find(x=>x.id===id);if(!r)return;
   if(!confirm(`${r.name} 고객의 착석을 취소하고 예약확정으로 되돌릴까요?`))return;
-  try{await apiUpdateField(id,{st:'confirmed'});showToast(`${r.name} 착석 취소 — 예약확정으로 변경`);}
+  try{await apiUpdateField(id,{st:'confirmed'});showToast(`${r.name} 착석 취소 — 예약확정으로 변경`);syncNow();}
   catch(err){showToast('⚠ 처리 실패: '+err.message);}
 }
 /* ★ 이용완료 — 배치도에서 즉시 사라짐 */
@@ -987,6 +965,7 @@ async function quickDone(id,e){
   try{
     await apiUpdateField(id,{st:'done'});
     showToast(`${r.name} 이용완료 — 테이블 비워짐`);
+    syncNow();
   }catch(err){showToast('⚠ 처리 실패: '+err.message);}
 }
 
@@ -1025,6 +1004,7 @@ async function confirmMove(){
     await apiUpdateField(moveResId,{tables:[moveTargetTbl],floor:T1.includes(moveTargetTbl)?1:2,merged:false});
     showToast(`${r.name} ${old}번 → ${moveTargetTbl}번 이동 완료`);
     closeMoveSheet();
+    syncNow();
   }catch(err){showToast('⚠ 처리 실패: '+err.message);}
 }
 
@@ -1216,6 +1196,7 @@ async function saveDetail(){
       render();
     }
     else{await apiUpdate({...localDraft,id:localId});}
+    syncNow();
   }catch(err){
     showToast('저장 실패: '+err.message);
   }finally{
