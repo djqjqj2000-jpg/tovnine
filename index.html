@@ -26,10 +26,10 @@
   --accent-bg:#EAE9F7;
   --accent-bg2:#D8D6F0;
 
-  /* 빈 테이블 - 차분한 그린 */
-  --vacant:#86EFAC;
-  --vacant-bg:#F0FDF4;
-  --vacant-bg2:#DCFCE7;
+  /* 빈 테이블 - 스카이 블루 */
+  --vacant:#7DD3FC;
+  --vacant-bg:#F0F9FF;
+  --vacant-bg2:#E0F2FE;
 
   /* 차 있는 카드 - 회색 */
   --filled-bg:#F4F4F7;
@@ -60,7 +60,7 @@
   --c50:#EAE9F7;--c100:#D8D6F0;--c400:#3730A3;--c600:#2D267A;--c800:#1F1B5A;
   --a50:#FEF3DC;--a100:#FDE9C2;--a400:#B45309;--a800:#783E08;
   --t50:#E0F2EA;--t100:#C7EAD8;--t400:#0E7C5A;--t800:#064E3B;
-  --g50:#F0FDF4;--g100:#DCFCE7;--g400:#16A34A;
+  --g50:#F0F9FF;--g100:#E0F2FE;--g400:#0EA5E9;
   --gr50:#F4F4F7;--gr100:#E5E5EB;--gr400:#5E6068;
   --p50:#EAE9F7;--p100:#D8D6F0;--p400:#3730A3;--p800:#1F1B5A;
   --r50:#FEE4E4;--r100:#FCC5C5;--r400:#B91C1C;--r800:#7F1D1D;
@@ -213,15 +213,15 @@ body{
 .res-item.hl-row{background:var(--highlight-bg);border:2px solid var(--highlight-border);padding:10px 13px;}
 .res-item-left{display:flex;align-items:center;gap:8px;flex:1;min-width:0;flex-wrap:wrap;}
 .res-time{font-size:14px;font-weight:700;color:var(--text);min-width:46px;font-feature-settings:'tnum' 1;letter-spacing:-0.02em;}
-.res-tbl{font-size:12px;padding:4px 10px;border-radius:6px;background:var(--filled-bg);color:var(--accent);border:1.5px solid var(--accent);white-space:nowrap;font-weight:700;font-family:'JetBrains Mono',monospace;}
-.res-tbl.mp{background:var(--filled-bg);color:var(--info);border-color:var(--info);}
+.res-tbl{font-size:12px;padding:4px 10px;border-radius:6px;background:var(--vacant-bg);color:#0369A1;border:1.5px solid var(--vacant);white-space:nowrap;font-weight:700;font-family:'JetBrains Mono',monospace;}
+.res-tbl.mp{background:var(--vacant-bg);color:#0369A1;border-color:var(--vacant);}
 .res-tbl.unset{background:var(--warn-bg);color:var(--warn);border-color:var(--warn);}
 .res-walkin{font-size:12px;padding:4px 9px;border-radius:6px;background:var(--accent);color:#fff;font-weight:700;white-space:nowrap;letter-spacing:0.02em;}
 .res-walkin .walkin-num{font-size:10px;font-weight:400;opacity:0.7;}
 .res-name{font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100px;letter-spacing:-0.02em;}
-.res-pax{font-size:12px;color:var(--text);white-space:nowrap;font-family:'JetBrains Mono',monospace;font-weight:500;}
+.res-pax{font-size:13px;color:var(--accent);white-space:nowrap;font-family:'JetBrains Mono',monospace;font-weight:700;}
 .res-ch{font-size:11px;padding:3px 8px;border-radius:6px;font-weight:600;}
-.ch-n{background:#E8F5E9;color:#2E7D32;border:1px solid #A5D6A7;}
+.ch-n{background:#E8F5E9;color:#1EC800;border:1px solid #A5D6A7;}
 .ch-p{background:var(--bg3);color:var(--text2);border:1px solid var(--border-strong);}
 .res-note{font-size:11px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100px;font-weight:500;}
 .quick-status{display:flex;align-items:center;gap:5px;flex-shrink:0;}
@@ -936,7 +936,7 @@ function renderList(){
         <span class="res-time">${r.time}</span>
         <span class="res-tbl${r.merged?' mp':''}${noTbl?' unset':''}">${tbl}</span>
         <span class="res-name">${r.name}</span>
-        ${r.type==='walkin'?`<span class="res-walkin">워크인<span class="walkin-num">${(r.name.match(/\\d+$/)||[''])[0]}</span></span>`:`<span class="res-pax">${r.pax}명</span><span class="res-ch ${r.ch==='naver'?'ch-n':'ch-p'}">${r.ch==='naver'?'네이버':'전화'}</span>`}
+        ${r.type==='walkin'?`<span class="res-walkin">워크인<span class="walkin-num">${(r.name.match(/\d+$/)||[''])[0]}</span></span>`:`<span class="res-pax">${r.pax}명</span><span class="res-ch ${r.ch==='naver'?'ch-n':'ch-p'}">${r.ch==='naver'?'네이버':'전화'}</span>`}
         ${r.note?`<span class="res-note">${r.note}</span>`:''}
       </div>
       <div class="quick-status">${qs}</div>
