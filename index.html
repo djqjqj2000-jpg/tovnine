@@ -540,6 +540,7 @@ const MONTHS_KO=['1월','2월','3월','4월','5월','6월','7월','8월','9월',
 
 /* ── 상태 변수 ── */
 let RES=[];
+let pendingUpdates=new Map(); // ★ 보호 목록: id → {fields, timestamp}
 let viewDate=new Date(TODAY);
 let calViewYear=TODAY.getFullYear(), calViewMonth=TODAY.getMonth();
 let sess='all', hlResId=null;
@@ -633,13 +634,21 @@ async function loadData(){
 /* ★ 자동 동기화 전용 — 실패해도 토스트 안 띄움 (조용히 다음 시도 대기) */
 async function loadDataAuto(){
   try{
-    const data=await apiCall({action:'getAll'}, {maxRetries:1}); // 자동은 재시도 1번만
-    RES=data.reservations||[];
+    const data=await apiCall({action:'getAll'}, {maxRetries:1});
+    let freshRES=data.reservations||[];
+    // ★ 보호 목록 병합 (loadDataSilent과 동일)
+    if(pendingUpdates.size>0){
+      const now=Date.now();
+      for(const [id, info] of pendingUpdates){
+        if(now-info.timestamp>30000){pendingUpdates.delete(id);continue;}
+        const freshIdx=freshRES.findIndex(r=>r.id===id);
+        if(freshIdx>=0){freshRES[freshIdx]={...freshRES[freshIdx],...info.fields};}
+      }
+    }
+    RES=freshRES;
     setSyncStatus('ok',`마지막 동기화: ${new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})}`);
     render();
   }catch(e){
-    // 자동 동기화는 조용히 실패 — 다음 1분 후 재시도
-    // 단, 동기화 표시줄에는 가볍게 표시 (사용자가 인지할 수 있게)
     setSyncStatus('error','일시적 연결 지연 — 자동 재시도 중');
   }
 }
@@ -648,7 +657,21 @@ async function loadDataAuto(){
 async function loadDataSilent(){
   try{
     const data=await apiCall({action:'getAll'}, {maxRetries:1});
-    RES=data.reservations||[];
+    let freshRES=data.reservations||[];
+    // ★ 보호 목록에 있는 항목은 로컬 값을 유지 (시트 반영 지연 보호)
+    if(pendingUpdates.size>0){
+      const now=Date.now();
+      for(const [id, info] of pendingUpdates){
+        // 30초 초과된 보호는 해제 (안전장치)
+        if(now-info.timestamp>30000){pendingUpdates.delete(id);continue;}
+        const freshIdx=freshRES.findIndex(r=>r.id===id);
+        if(freshIdx>=0){
+          // 시트 데이터에 보호된 필드를 덮어씀 (로컬 우선)
+          freshRES[freshIdx]={...freshRES[freshIdx],...info.fields};
+        }
+      }
+    }
+    RES=freshRES;
     setSyncStatus('ok',`마지막 동기화: ${new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})}`);
   }catch(e){/* 조용히 실패 — 기존 로컬 데이터 유지 */}
 }
@@ -706,8 +729,12 @@ async function apiUpdateField(id, fields){
     r=RES.find(x=>x.id===id);
   }
   if(!r)throw new Error('예약을 찾을 수 없습니다 (id: '+id+')');
+  // ★ 보호 목록에 등록 — 동기화 시 이 필드는 로컬 값 우선
+  pendingUpdates.set(id, {fields:{...fields}, timestamp:Date.now()});
   const updated={...r,...fields};
   await apiUpdate(updated);
+  // ★ 저장 성공 후 5초 뒤 보호 해제 (시트 반영 대기)
+  setTimeout(()=>{pendingUpdates.delete(id);}, 5000);
 }
 
 function showLoading(msg='처리 중...'){
@@ -943,14 +970,14 @@ function render(){renderStats();renderDashFP();renderList();}
 async function quickArrive(id,e){
   e.stopPropagation();
   const r=RES.find(x=>x.id===id);if(!r)return;
-  try{await apiUpdateField(id,{st:'arrived'});showToast(`${r.name} 착석 처리 완료`);syncNow();}
+  try{await apiUpdateField(id,{st:'arrived'});showToast(`${r.name} 착석 처리 완료`);}
   catch(err){showToast('⚠ 처리 실패: '+err.message);}
 }
 async function cancelArrive(id,e){
   e.stopPropagation();
   const r=RES.find(x=>x.id===id);if(!r)return;
   if(!confirm(`${r.name} 고객의 착석을 취소하고 예약확정으로 되돌릴까요?`))return;
-  try{await apiUpdateField(id,{st:'confirmed'});showToast(`${r.name} 착석 취소 — 예약확정으로 변경`);syncNow();}
+  try{await apiUpdateField(id,{st:'confirmed'});showToast(`${r.name} 착석 취소 — 예약확정으로 변경`);}
   catch(err){showToast('⚠ 처리 실패: '+err.message);}
 }
 /* ★ 이용완료 — 배치도에서 즉시 사라짐 */
@@ -960,7 +987,6 @@ async function quickDone(id,e){
   try{
     await apiUpdateField(id,{st:'done'});
     showToast(`${r.name} 이용완료 — 테이블 비워짐`);
-    syncNow();
   }catch(err){showToast('⚠ 처리 실패: '+err.message);}
 }
 
@@ -999,7 +1025,6 @@ async function confirmMove(){
     await apiUpdateField(moveResId,{tables:[moveTargetTbl],floor:T1.includes(moveTargetTbl)?1:2,merged:false});
     showToast(`${r.name} ${old}번 → ${moveTargetTbl}번 이동 완료`);
     closeMoveSheet();
-    syncNow();
   }catch(err){showToast('⚠ 처리 실패: '+err.message);}
 }
 
@@ -1191,7 +1216,6 @@ async function saveDetail(){
       render();
     }
     else{await apiUpdate({...localDraft,id:localId});}
-    syncNow();
   }catch(err){
     showToast('저장 실패: '+err.message);
   }finally{
