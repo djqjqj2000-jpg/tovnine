@@ -151,17 +151,17 @@ body{
 .fp-tbl:hover{box-shadow:0 2px 8px rgba(0,0,0,0.06);}
 .fp-tbl-num{font-size:11px;font-weight:600;color:var(--text);text-align:center;line-height:1.1;}
 
-/* 빈 테이블 - 차분한 그린 강조 */
-.fp-available{background:var(--vacant-bg);border-color:var(--vacant);}
-.fp-available .fp-tbl-num{color:#0369A1;font-weight:600;}
+/* 빈 테이블 - 회색 (차분하게 비어있음) */
+.fp-available{background:var(--filled-bg);border-color:var(--filled-border);}
+.fp-available .fp-tbl-num{color:var(--text3);font-weight:500;}
 
-/* 차 있는 카드 - 회색 + 좌상단 대각선 */
-.fp-reserved,.fp-occupied,.fp-merged{background:var(--filled-bg);border-color:var(--filled-border);border-width:1px;}
+/* 차 있는 카드 - 스카이 블루 배경 + 좌상단 대각선 */
+.fp-reserved,.fp-occupied,.fp-merged{background:var(--vacant-bg);border-color:var(--vacant);border-width:1.5px;}
 .fp-reserved::before,.fp-occupied::before,.fp-merged::before{content:'';position:absolute;top:0;left:0;width:11px;height:11px;clip-path:polygon(0 0, 100% 0, 0 100%);}
 .fp-reserved::before{background:var(--dot-reserved);}
 .fp-occupied::before{background:var(--dot-occupied);}
 .fp-merged::before{background:var(--dot-occupied);}
-.fp-reserved .fp-tbl-num,.fp-occupied .fp-tbl-num,.fp-merged .fp-tbl-num{color:var(--filled-text);font-weight:500;}
+.fp-reserved .fp-tbl-num,.fp-occupied .fp-tbl-num,.fp-merged .fp-tbl-num{color:#0369A1;font-weight:600;}
 
 /* 합석 마크 - 우상단 + 기호 */
 .fp-merged::after{content:'+';position:absolute;top:-2px;right:3px;font-size:11px;font-weight:700;color:var(--info);line-height:1;font-family:'JetBrains Mono',monospace;}
@@ -456,7 +456,7 @@ body{
   </div>
 
   <div class="legend">
-    <div class="leg"><div class="leg-dot leg-vacant"></div>빈 테이블</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--filled-bg);border:1.5px solid var(--filled-border);border-radius:3px"></div>빈 테이블</div>
     <div class="leg"><div class="leg-dot leg-tri" style="background:var(--dot-reserved)"></div>예약있음</div>
     <div class="leg"><div class="leg-dot leg-tri" style="background:var(--dot-occupied)"></div>착석중</div>
     <div class="leg"><span class="leg-walkin">W</span>워크인</div>
