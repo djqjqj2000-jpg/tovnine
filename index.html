@@ -1178,11 +1178,9 @@ function bgClick(e){if(e.target===document.getElementById('modal-overlay'))close
 let _isSaving=false;
 async function saveDetail(){
   if(_isSaving)return;
-  // ★ 가드: origId가 null이거나 이미 취소된 예약이면 재저장 금지 (취소 직후 saveDetail 트리거 방어)
-  if(origId===null){closeSheet();return;}
+  // ★ 가드: 이미 취소된 예약이면 재저장 금지
   if(draft && draft.st==='cancelled'){closeSheet();return;}
-  const existing=RES.find(x=>x.id===origId);
-  if(existing && existing.st==='cancelled'){closeSheet();return;}
+  if(origId!==null){const existing=RES.find(x=>x.id===origId);if(existing && existing.st==='cancelled'){closeSheet();return;}}
   const fn=document.getElementById('fn'),fx=document.getElementById('fx'),fp2=document.getElementById('fp2'),ta=document.querySelector('#dfi textarea');
   if(fn)draft.name=fn.value.trim();if(fx)draft.pax=parseInt(fx.value)||0;if(fp2)draft.phone=fp2.value.trim();if(ta)draft.note=ta.value.trim();
   if(!draft.name||!draft.pax){alert('필수 항목을 입력해 주세요.');return;}
