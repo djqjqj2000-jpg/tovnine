@@ -218,6 +218,7 @@ body{
 .res-tbl{font-size:12px;padding:4px 10px;border-radius:6px;background:var(--vacant-bg);color:#0369A1;border:1.5px solid var(--vacant);white-space:nowrap;font-weight:700;font-family:'JetBrains Mono',monospace;}
 .res-tbl.mp{background:var(--vacant-bg);color:#0369A1;border-color:var(--vacant);}
 .res-tbl.unset{background:#FFF5F6;color:#BE123C;border-color:#E8B4BC;}
+.res-tbl.done{background:var(--filled-bg);color:var(--text3);border-color:var(--filled-border);}
 .res-walkin{font-size:11px;padding:3px 8px;border-radius:6px;background:transparent;color:var(--accent);border:1px solid var(--accent);font-weight:600;white-space:nowrap;letter-spacing:0.02em;}
 .res-walkin .walkin-num{font-size:10px;font-weight:400;opacity:0.7;}
 .res-name{font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100px;letter-spacing:-0.02em;}
@@ -939,7 +940,7 @@ function renderList(){
         <div class="res-item-row">
           <div class="res-item-left">
             <span class="res-time">${r.time}</span>
-            <span class="res-tbl${r.merged?' mp':''}${noTbl?' unset':''}">${tbl}</span>
+            <span class="res-tbl${r.merged?' mp':''}${noTbl?' unset':''}${r.st==='done'?' done':''}">${tbl}</span>
             <span class="res-name">${r.type==='walkin'?`워크인<span class="name-num">${(r.name.match(/\d+$/)||[''])[0]}</span>`:r.name}</span>
             ${r.type==='walkin'?'<span class="res-walkin">워크인</span>':`<span class="res-pax">${r.pax}명</span><span class="res-ch ${r.ch==='naver'?'ch-n':'ch-p'}">${r.ch==='naver'?'네이버':'전화'}</span>`}
           </div>
@@ -1215,18 +1216,10 @@ async function cancelRes(){
   const localName=draft.name;
   try{
     await apiUpdateField(localId,{st:'cancelled'});
-    const idx=RES.findIndex(x=>x.id===localId);
-    if(idx>=0)RES[idx]={...RES[idx],st:'cancelled'};
     // ★ draft 자체도 cancelled로 표시 — 이후 saveDetail이 실수로 호출돼도 방어
     if(draft)draft.st='cancelled';
     showToast(`${localName} 예약 취소 처리 완료`);
-    // ★ 모달 확실히 닫기 — 기존 코드 대신 closeSheet() 사용
     closeSheet();
-    setTimeout(()=>{
-      loadDataSilent().then(()=>{
-        render();
-      }).catch(()=>{});
-    },800);
   }catch(err){
     showToast('⚠ 취소 실패: '+err.message);
   }
