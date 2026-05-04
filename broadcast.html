@@ -40,20 +40,12 @@ body{
   letter-spacing:-0.01em;
   user-select:none;
   -webkit-user-select:none;
-  /* ★ 핵심: 화면 높이에 따라 모든 글씨 크기가 자동 조정 
-     1vh = 화면 높이의 1%. 16:10 가로 태블릿(800px 높이)이면 1vh = 8px */
 }
 
-/* ──────────────────────────────────
-   ★ 핵심: 100% 높이 안에 모든 게 들어가도록 강제
-   - .app: 100vh 고정, overflow 금지
-   - 좌측: flex로 공간 배분
-   - 우측 키패드: grid 1fr*4행 → 자동 비율
-────────────────────────────────── */
 .app{
   width:100vw;
   height:100vh;
-  height:100dvh; /* 모바일 브라우저 주소창 고려 */
+  height:100dvh;
   padding:1.5vh 1.5vw;
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -100,7 +92,6 @@ body{
   font-weight:600;
 }
 
-/* 차량번호 입력 영역 — 화면 높이 기준으로 자동 축소 */
 .plate-section{
   background:var(--surface);
   border:1px solid var(--border);
@@ -123,7 +114,6 @@ body{
   gap:0.8vw;
 }
 .plate-cell{
-  /* aspect-ratio 제거 - 대신 고정 높이로 제어 */
   height:clamp(55px, 11vh, 110px);
   background:var(--bg2);
   color:var(--text3);
@@ -148,7 +138,6 @@ body{
   background:var(--accent-bg);
 }
 
-/* 미리보기 — flex로 남는 공간 차지하되, 너무 작아지지 않게 최소 높이 */
 .preview-section{
   background:var(--surface);
   border:1px solid var(--border);
@@ -193,7 +182,6 @@ body{
   letter-spacing:0.2em;
 }
 
-/* 방송 시작 버튼 — 무조건 보이도록 고정 */
 .broadcast-btn{
   width:100%;
   padding:clamp(14px, 2.5vh, 24px);
@@ -230,7 +218,6 @@ body{
   line-height:1;
 }
 
-/* ──── 우측 패널: 숫자패드 ──── */
 .right-panel{
   background:var(--surface);
   border:1px solid var(--border);
@@ -314,7 +301,6 @@ body{
   transform:translateX(-50%) translateY(0);
 }
 
-/* 세로 모드(orientation:portrait) 대비 — 기본은 가로지만 안전장치 */
 @media (orientation:portrait){
   .app{
     grid-template-columns:1fr;
@@ -398,6 +384,24 @@ const TRIM_LAST_DIGIT = 200;
 const TRIM_LAST_DIGIT_FIRST_GROUP = 100;
 const TRIM_OUTRO = 0;
 
+/* ══════════════════════════════════════════
+   ★ 음량 증폭 설정 (Web Audio API GainNode 사용)
+   - GAIN_GLOBAL: 모든 음원에 공통 적용되는 기본 게인
+   - GAIN_BOOST: 특정 음원에 추가로 적용되는 게인
+   - 최종 게인 = GAIN_GLOBAL × GAIN_BOOST[key]
+   - 1.0 = 원본 음량, 1.5 = 1.5배, 2.0 = 2배
+   - 너무 키우면 클리핑(찢어지는 소리) 발생 가능
+══════════════════════════════════════════ */
+const GAIN_GLOBAL = 1.5;  // 모든 음원 공통 1.5배
+
+// 특정 음원만 추가 부스트 (없으면 1.0배 = 추가 부스트 없음)
+const GAIN_BOOST = {
+  '0': 1.2,  // "영"
+  '2': 1.2,  // "이"
+  '5': 1.2,  // "오"
+  '9': 1.2,  // "구"
+};
+
 const AUDIO = {
   chime: 'audio/chime.mp3',
   intro: 'audio/intro.mp3',
@@ -416,19 +420,40 @@ const AUDIO = {
 
 let plateDigits = ['', '', '', ''];
 let isPlaying = false;
-let audioCache = {};
+let audioBuffers = {};        // ★ Web Audio용 디코딩된 버퍼
+let audioContext = null;       // ★ 단일 AudioContext 재사용
 
-function preloadAudio(){
-  Object.entries(AUDIO).forEach(([key, path]) => {
-    const audio = new Audio(path);
-    audio.preload = 'auto';
-    audio.load();
-    audioCache[key] = audio;
+/* ══════════════════════════════════════════
+   ★ Web Audio 초기화 — fetch + decode로 미리 버퍼 준비
+   - 일반 <Audio> 태그가 아닌 ArrayBuffer로 받아 decodeAudioData
+   - GainNode를 통해 음량을 1배 이상으로 증폭 가능
+══════════════════════════════════════════ */
+async function initAudioContext(){
+  if(audioContext) return;
+  audioContext = new (window.AudioContext || window.webkitAudioContext)();
+}
+
+async function preloadAudio(){
+  await initAudioContext();
+  const promises = Object.entries(AUDIO).map(async ([key, path]) => {
+    try{
+      const res = await fetch(path);
+      const arrayBuffer = await res.arrayBuffer();
+      const buffer = await audioContext.decodeAudioData(arrayBuffer);
+      audioBuffers[key] = buffer;
+    }catch(e){
+      console.error('음원 로드 실패:', key, e);
+    }
   });
+  await Promise.all(promises);
 }
 
 function pressKey(digit){
   if(isPlaying) return;
+  // 첫 사용자 인터랙션 시 AudioContext resume (자동재생 정책 대응)
+  if(audioContext && audioContext.state === 'suspended'){
+    audioContext.resume();
+  }
   const filledIdx = plateDigits.findIndex(d => d === '');
   if(filledIdx === -1) return;
   plateDigits[filledIdx] = digit;
@@ -491,6 +516,11 @@ async function startBroadcast(){
   if(isPlaying) return;
   if(plateDigits.some(d => d === '')) return;
   
+  // AudioContext가 suspended면 resume (브라우저 자동재생 정책)
+  if(audioContext && audioContext.state === 'suspended'){
+    await audioContext.resume();
+  }
+  
   isPlaying = true;
   updatePlayingUI(true);
   
@@ -538,16 +568,31 @@ async function playDigits(isFirstGroup){
   }
 }
 
+/* ══════════════════════════════════════════
+   ★ Web Audio API로 재생 — GainNode로 음량 증폭
+   - 디코딩된 버퍼 → AudioBufferSourceNode → GainNode → 출력
+   - GainNode의 gain.value > 1.0 으로 원본보다 크게 재생 가능
+══════════════════════════════════════════ */
 function playAudioTrimmed(key, trimMs){
   return new Promise((resolve, reject) => {
-    const cached = audioCache[key];
-    if(!cached){
+    const buffer = audioBuffers[key];
+    if(!buffer || !audioContext){
       reject(new Error('음원을 찾을 수 없음: ' + key));
       return;
     }
     
-    const audio = new Audio(cached.src);
-    audio.volume = 1.0;
+    // 음원 노드 생성
+    const source = audioContext.createBufferSource();
+    source.buffer = buffer;
+    
+    // 게인 노드 생성 — 음량 증폭의 핵심
+    const gainNode = audioContext.createGain();
+    const boost = GAIN_BOOST[key] || 1.0;
+    gainNode.gain.value = GAIN_GLOBAL * boost;
+    
+    // 노드 연결: source → gain → 스피커 출력
+    source.connect(gainNode);
+    gainNode.connect(audioContext.destination);
     
     let resolved = false;
     let trimTimer = null;
@@ -559,32 +604,24 @@ function playAudioTrimmed(key, trimMs){
       resolve();
     };
     
-    if(trimMs <= 0){
-      audio.addEventListener('ended', finish, {once:true});
-    } else {
-      audio.addEventListener('loadedmetadata', () => {
-        const dur = audio.duration * 1000;
-        const trigger = Math.max(0, dur - trimMs);
-        trimTimer = setTimeout(finish, trigger);
-      }, {once:true});
-      audio.addEventListener('ended', finish, {once:true});
+    // 음원 끝나면 자동으로 finish (안전장치)
+    source.addEventListener('ended', finish, {once:true});
+    
+    // 재생 시작
+    try{
+      source.start(0);
+    }catch(err){
+      reject(new Error('재생 시작 실패: ' + err.message));
+      return;
     }
     
-    audio.addEventListener('error', () => {
-      if(!resolved){
-        resolved = true;
-        if(trimTimer) clearTimeout(trimTimer);
-        reject(new Error('음원 재생 오류: ' + key));
-      }
-    }, {once:true});
-    
-    audio.play().catch(err => {
-      if(!resolved){
-        resolved = true;
-        if(trimTimer) clearTimeout(trimTimer);
-        reject(new Error('재생 권한 문제: ' + err.message));
-      }
-    });
+    // trim 적용 — 끝나기 trimMs 전에 다음으로 넘김
+    if(trimMs > 0){
+      const durMs = buffer.duration * 1000;
+      const trigger = Math.max(0, durMs - trimMs);
+      trimTimer = setTimeout(finish, trigger);
+    }
+    // trimMs <= 0 이면 ended 이벤트만 기다림 (위에서 등록됨)
   });
 }
 
@@ -627,6 +664,18 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+// 첫 사용자 클릭 시 AudioContext 활성화 (자동재생 정책 대응)
+function activateAudioOnFirstInteraction(){
+  initAudioContext().then(() => {
+    if(audioContext.state === 'suspended'){
+      audioContext.resume();
+    }
+  });
+}
+document.addEventListener('click', activateAudioOnFirstInteraction, {once:true});
+document.addEventListener('touchstart', activateAudioOnFirstInteraction, {once:true});
+
+// 페이지 진입 시 음원 미리 로드 (Web Audio용 버퍼)
 preloadAudio();
 renderPlate();
 updateBroadcastBtn();
