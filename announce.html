@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>토브나인 매장 안내방송</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#FAFAFB;
+  --bg2:#F4F4F7;
+  --bg3:#EAEAEF;
+  --surface:#FFFFFF;
+  --border:#E5E5EB;
+  --border-strong:#D1D1DA;
+  --text:#15161B;
+  --text2:#5E6068;
+  --text3:#9B9DA5;
+  --accent:#3730A3;
+  --accent-soft:#4F46BA;
+  --accent-bg:#EAE9F7;
+  --accent-bg2:#D8D6F0;
+  --danger:#B91C1C;
+  --success:#0E7C5A;
+}
+html, body{
+  width:100%;
+  height:100%;
+  overflow:hidden;
+}
+body{
+  font-family:'Pretendard','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:var(--bg2);
+  color:var(--text);
+  -webkit-tap-highlight-color:transparent;
+  -webkit-font-smoothing:antialiased;
+  font-feature-settings:'tnum' 1;
+  letter-spacing:-0.01em;
+  user-select:none;
+  -webkit-user-select:none;
+}
+
+.app{
+  width:100vw;
+  height:100vh;
+  height:100dvh;
+  padding:1.5vh 1.5vw;
+  display:flex;
+  flex-direction:column;
+  gap:1.2vh;
+  overflow:hidden;
+}
+
+.hdr{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-shrink:0;
+  padding:0 0.5vw;
+}
+.hdr h1{
+  font-size:clamp(18px, 3.5vh, 32px);
+  font-weight:700;
+  color:var(--text);
+  letter-spacing:-0.04em;
+  line-height:1.2;
+}
+.hdr p{
+  font-size:clamp(10px, 1.5vh, 14px);
+  color:var(--text2);
+  margin-top:0.3vh;
+  font-family:'JetBrains Mono',monospace;
+}
+.brand-badge{
+  font-size:clamp(10px, 1.5vh, 13px);
+  color:var(--text3);
+  font-family:'JetBrains Mono',monospace;
+  padding:0.8vh 1.2vw;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:8px;
+  font-weight:600;
+}
+
+.cards-area{
+  flex:1;
+  min-height:0;
+  display:grid;
+  grid-template-columns:repeat(var(--cols, 3), 1fr);
+  grid-auto-rows:1fr;
+  gap:1vw;
+  overflow:auto;
+}
+
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:clamp(14px, 2.5vh, 24px);
+  display:flex;
+  flex-direction:column;
+  gap:1vh;
+  cursor:pointer;
+  transition:all 0.15s;
+  position:relative;
+  min-height:0;
+  overflow:hidden;
+}
+.card:hover{
+  border-color:var(--accent-bg2);
+  background:var(--accent-bg);
+}
+.card:active{
+  transform:scale(0.98);
+}
+.card.playing{
+  background:var(--accent);
+  border-color:var(--accent);
+  cursor:wait;
+}
+.card.playing .card-title,
+.card.playing .card-time,
+.card.playing .card-action,
+.card.playing .info-btn{
+  color:#FFFFFF;
+}
+.card.playing .info-btn{
+  background:rgba(255,255,255,0.15);
+  border-color:rgba(255,255,255,0.3);
+}
+.card.disabled{
+  opacity:0.4;
+  pointer-events:none;
+}
+
+.card-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:8px;
+}
+.card-title{
+  font-size:clamp(18px, 3vh, 28px);
+  font-weight:700;
+  color:var(--text);
+  letter-spacing:-0.03em;
+  line-height:1.2;
+  flex:1;
+}
+.info-btn{
+  width:clamp(28px, 4vh, 36px);
+  height:clamp(28px, 4vh, 36px);
+  border-radius:50%;
+  background:var(--bg2);
+  border:1px solid var(--border);
+  color:var(--text2);
+  font-size:clamp(13px, 2vh, 18px);
+  font-weight:600;
+  font-style:italic;
+  font-family:'Times New Roman',serif;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+  transition:all 0.15s;
+}
+.info-btn:hover{
+  background:var(--accent-bg);
+  border-color:var(--accent);
+  color:var(--accent);
+}
+.info-btn:active{
+  transform:scale(0.92);
+}
+
+.card-time{
+  font-size:clamp(20px, 4vh, 38px);
+  font-weight:700;
+  color:var(--accent);
+  font-family:'JetBrains Mono',monospace;
+  letter-spacing:-0.02em;
+  line-height:1;
+}
+
+.card-spacer{
+  flex:1;
+}
+
+.card-action{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding:clamp(10px, 1.8vh, 16px);
+  background:var(--accent);
+  color:#FFFFFF;
+  border-radius:10px;
+  font-size:clamp(13px, 2.2vh, 18px);
+  font-weight:600;
+  letter-spacing:-0.01em;
+  flex-shrink:0;
+}
+.card-action-icon{
+  font-size:clamp(14px, 2.2vh, 18px);
+  line-height:1;
+}
+
+.modal-overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.5);
+  z-index:200;
+  align-items:center;
+  justify-content:center;
+  padding:3vh 3vw;
+}
+.modal-overlay.show{
+  display:flex;
+}
+.modal{
+  background:var(--surface);
+  border-radius:16px;
+  max-width:600px;
+  width:100%;
+  max-height:90vh;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  box-shadow:0 8px 30px rgba(0,0,0,0.15);
+}
+.modal-hdr{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  padding:18px 20px;
+  border-bottom:1px solid var(--border);
+  gap:12px;
+}
+.modal-ttl-wrap{flex:1;}
+.modal-ttl{
+  font-size:18px;
+  font-weight:700;
+  color:var(--text);
+  letter-spacing:-0.03em;
+  line-height:1.3;
+}
+.modal-time{
+  font-size:13px;
+  color:var(--accent);
+  font-family:'JetBrains Mono',monospace;
+  font-weight:600;
+  margin-top:3px;
+}
+.close-x{
+  font-size:18px;
+  color:var(--text2);
+  cursor:pointer;
+  background:none;
+  border:none;
+  width:32px;
+  height:32px;
+  border-radius:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+  transition:background 0.15s;
+}
+.close-x:hover{background:var(--bg2);color:var(--text);}
+.modal-body{
+  padding:18px 20px;
+  flex:1;
+  overflow-y:auto;
+}
+.modal-section-label{
+  font-size:11px;
+  color:var(--text3);
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:0.05em;
+  margin-bottom:8px;
+}
+.modal-text{
+  font-size:15px;
+  color:var(--text);
+  line-height:1.7;
+  font-weight:500;
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:14px 16px;
+}
+.modal-text .highlight{
+  background:var(--accent-bg);
+  color:var(--accent);
+  font-weight:700;
+  padding:1px 6px;
+  border-radius:5px;
+  font-family:'JetBrains Mono',monospace;
+}
+.modal-foot{
+  padding:14px 20px 18px;
+  border-top:1px solid var(--border);
+  background:var(--bg2);
+  display:flex;
+  gap:8px;
+}
+.modal-btn-play{
+  flex:1;
+  font-family:inherit;
+  font-size:14px;
+  font-weight:700;
+  padding:13px;
+  background:var(--accent);
+  color:#FFFFFF;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  letter-spacing:-0.01em;
+  transition:background 0.15s;
+}
+.modal-btn-play:hover{background:var(--accent-soft);}
+.modal-btn-play:active{transform:scale(0.98);}
+.modal-btn-close{
+  font-family:inherit;
+  font-size:13px;
+  padding:13px 18px;
+  background:transparent;
+  color:var(--text2);
+  border:1px solid var(--border);
+  border-radius:10px;
+  cursor:pointer;
+  transition:all 0.15s;
+}
+.modal-btn-close:hover{
+  background:var(--bg3);
+  color:var(--text);
+}
+
+.toast{
+  position:fixed;
+  bottom:3vh;
+  left:50%;
+  transform:translateX(-50%) translateY(20px);
+  background:#1a1a1a;
+  color:#FFFFFF;
+  font-size:clamp(12px, 2vh, 16px);
+  padding:1.2vh 2.5vw;
+  border-radius:28px;
+  opacity:0;
+  transition:all 0.25s;
+  pointer-events:none;
+  z-index:300;
+  white-space:nowrap;
+  font-family:inherit;
+  letter-spacing:-0.01em;
+  font-weight:500;
+}
+.toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+
+@media (orientation:portrait){
+  .cards-area{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <div class="hdr">
+    <div>
+      <h1>매장 안내방송</h1>
+      <p>Store Announcement</p>
+    </div>
+    <div class="brand-badge">toV9</div>
+  </div>
+
+  <div class="cards-area" id="cards-area"></div>
+
+</div>
+
+<div class="modal-overlay" id="modal-overlay" onclick="bgClickModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-hdr">
+      <div class="modal-ttl-wrap">
+        <div class="modal-ttl" id="modal-ttl"></div>
+        <div class="modal-time" id="modal-time"></div>
+      </div>
+      <button class="close-x" onclick="closeModal()" aria-label="닫기">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-section-label">방송 멘트 전문</div>
+      <div class="modal-text" id="modal-text"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="modal-btn-play" id="modal-btn-play" onclick="playFromModal()">
+        <span>📢</span>
+        <span>이 방송 시작</span>
+      </button>
+      <button class="modal-btn-close" onclick="closeModal()">닫기</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══════════════════════════════════════════
+   ★ 안내방송 데이터 — 새 방송 추가 시 이 배열에만 항목 추가
+══════════════════════════════════════════ */
+const ANNOUNCEMENTS = [
+  {
+    id: 'lastorder',
+    title: '라스트 오더',
+    time: '7시 50분',
+    audio: 'audio/lastorder.mp3',
+    text: '토브나인을 찾아주신 고객님께 안내드립니다. 잠시 후 7시 50분까지 라스트 오더가 마감됩니다. 추가 주문이 있으신 고객님께서는 마감 전에 주문해 주시기 바랍니다. 오늘도 토브나인에서 행복하세요.',
+    highlights: ['7시 50분']
+  },
+  {
+    id: 'breaktime',
+    title: '브레이크 타임',
+    time: '3시 ~ 5시',
+    audio: 'audio/breaktime.mp3',
+    text: '토브나인을 찾아주신 고객님께 안내드립니다. 1층은 3시부터 5시까지 브레이크 타임으로 운영됩니다. 계속해서 매장을 이용하실 고객님께서는 2층을 이용해 주시면 감사하겠습니다. 오늘도 토브나인에서 행복하세요.',
+    highlights: ['1층', '3시부터 5시까지', '2층']
+  },
+  {
+    id: 'closing',
+    title: '영업 마감',
+    time: '9시',
+    audio: 'audio/closing.mp3',
+    text: '토브나인을 찾아주신 고객님께 안내드립니다. 잠시 후 9시에 영업이 마감됩니다. 오늘도 즐겁고 행복한 시간 되셨길 바라며 안전하게 귀가하시기 바랍니다. 감사합니다.',
+    highlights: ['9시']
+  },
+];
+
+const CHIME_AUDIO = 'audio/chime.mp3';
+const TRIM_CHIME = 200;
+const TRIM_MESSAGE = 0;
+
+/* ══════════════════════════════════════════
+   ★ 음량 설정 (주차 방송과 통일)
+   - GAIN_GLOBAL: 1.65
+   - GAIN_BOOST: 멘트 전체는 균일한 음량이라 개별 부스트 불필요
+══════════════════════════════════════════ */
+const GAIN_GLOBAL = 1.65;
+const GAIN_BOOST = {};
+
+function getGridCols(count){
+  if(count <= 3) return count;
+  if(count === 4) return 2;
+  if(count <= 6) return 3;
+  if(count <= 9) return 3;
+  return 4;
+}
+
+let isPlaying = false;
+let audioBuffers = {};
+let audioContext = null;
+let currentModalId = null;
+
+async function initAudioContext(){
+  if(audioContext) return;
+  audioContext = new (window.AudioContext || window.webkitAudioContext)();
+}
+
+async function preloadAudio(){
+  await initAudioContext();
+  const allPaths = [CHIME_AUDIO, ...ANNOUNCEMENTS.map(a => a.audio)];
+  const promises = allPaths.map(async (path) => {
+    try{
+      const res = await fetch(path);
+      const arrayBuffer = await res.arrayBuffer();
+      const buffer = await audioContext.decodeAudioData(arrayBuffer);
+      audioBuffers[path] = buffer;
+    }catch(e){
+      console.error('음원 로드 실패:', path, e);
+    }
+  });
+  await Promise.all(promises);
+}
+
+function renderCards(){
+  const area = document.getElementById('cards-area');
+  const cols = getGridCols(ANNOUNCEMENTS.length);
+  area.style.setProperty('--cols', cols);
+  
+  area.innerHTML = ANNOUNCEMENTS.map(a => `
+    <div class="card" id="card-${a.id}" onclick="playAnnouncement('${a.id}', event)">
+      <div class="card-header">
+        <div class="card-title">${a.title}</div>
+        <button class="info-btn" onclick="openModal('${a.id}', event)" aria-label="${a.title} 전문 보기">i</button>
+      </div>
+      <div class="card-time">${a.time}</div>
+      <div class="card-spacer"></div>
+      <div class="card-action">
+        <span class="card-action-icon">📢</span>
+        <span class="card-action-text">방송 시작</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openModal(id, e){
+  if(e) e.stopPropagation();
+  if(isPlaying) return;
+  
+  const a = ANNOUNCEMENTS.find(x => x.id === id);
+  if(!a) return;
+  
+  currentModalId = id;
+  document.getElementById('modal-ttl').textContent = a.title;
+  document.getElementById('modal-time').textContent = a.time;
+  
+  let highlightedText = a.text;
+  if(a.highlights && a.highlights.length){
+    a.highlights.forEach(kw => {
+      const re = new RegExp(kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+      highlightedText = highlightedText.replace(re, `<span class="highlight">${kw}</span>`);
+    });
+  }
+  document.getElementById('modal-text').innerHTML = highlightedText;
+  
+  document.getElementById('modal-overlay').classList.add('show');
+}
+
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('show');
+  currentModalId = null;
+}
+
+function bgClickModal(e){
+  if(e.target === document.getElementById('modal-overlay')) closeModal();
+}
+
+function playFromModal(){
+  if(!currentModalId) return;
+  const id = currentModalId;
+  closeModal();
+  setTimeout(() => playAnnouncement(id), 100);
+}
+
+async function playAnnouncement(id, e){
+  if(e) e.stopPropagation();
+  if(isPlaying) return;
+  
+  const a = ANNOUNCEMENTS.find(x => x.id === id);
+  if(!a) return;
+  
+  if(audioContext && audioContext.state === 'suspended'){
+    await audioContext.resume();
+  }
+  
+  isPlaying = true;
+  setPlayingUI(id, true);
+  
+  try{
+    await playAudioTrimmed(CHIME_AUDIO, TRIM_CHIME);
+    await playAudioTrimmed(a.audio, TRIM_MESSAGE);
+    
+    showToast('방송 완료');
+    
+    setTimeout(() => {
+      isPlaying = false;
+      setPlayingUI(id, false);
+    }, 600);
+    
+  }catch(err){
+    showToast('⚠ 재생 실패: ' + err.message);
+    isPlaying = false;
+    setPlayingUI(id, false);
+  }
+}
+
+function setPlayingUI(activeId, playing){
+  document.querySelectorAll('.card').forEach(card => {
+    const cardId = card.id.replace('card-', '');
+    card.classList.remove('playing', 'disabled');
+    if(playing){
+      if(cardId === activeId){
+        card.classList.add('playing');
+        card.querySelector('.card-action-text').textContent = '방송 중...';
+      } else {
+        card.classList.add('disabled');
+      }
+    } else {
+      card.querySelector('.card-action-text').textContent = '방송 시작';
+    }
+  });
+}
+
+function playAudioTrimmed(path, trimMs){
+  return new Promise((resolve, reject) => {
+    const buffer = audioBuffers[path];
+    if(!buffer || !audioContext){
+      reject(new Error('음원을 찾을 수 없음: ' + path));
+      return;
+    }
+    
+    const source = audioContext.createBufferSource();
+    source.buffer = buffer;
+    
+    const gainNode = audioContext.createGain();
+    const boost = GAIN_BOOST[path] || 1.0;
+    gainNode.gain.value = GAIN_GLOBAL * boost;
+    
+    source.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    let resolved = false;
+    let trimTimer = null;
+    
+    const finish = () => {
+      if(resolved) return;
+      resolved = true;
+      if(trimTimer) clearTimeout(trimTimer);
+      resolve();
+    };
+    
+    source.addEventListener('ended', finish, {once:true});
+    
+    try{
+      source.start(0);
+    }catch(err){
+      reject(new Error('재생 시작 실패: ' + err.message));
+      return;
+    }
+    
+    if(trimMs > 0){
+      const durMs = buffer.duration * 1000;
+      const trigger = Math.max(0, durMs - trimMs);
+      trimTimer = setTimeout(finish, trigger);
+    }
+  });
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+document.addEventListener('keydown', (e) => {
+  if(isPlaying) return;
+  if(e.key >= '1' && e.key <= '9'){
+    const idx = parseInt(e.key) - 1;
+    if(idx < ANNOUNCEMENTS.length){
+      playAnnouncement(ANNOUNCEMENTS[idx].id);
+    }
+  } else if(e.key === 'Escape'){
+    if(document.getElementById('modal-overlay').classList.contains('show')){
+      closeModal();
+    }
+  }
+});
+
+function activateAudioOnFirstInteraction(){
+  initAudioContext().then(() => {
+    if(audioContext.state === 'suspended'){
+      audioContext.resume();
+    }
+  });
+}
+document.addEventListener('click', activateAudioOnFirstInteraction, {once:true});
+document.addEventListener('touchstart', activateAudioOnFirstInteraction, {once:true});
+
+renderCards();
+preloadAudio();
+
+async function preventScreenLock(){
+  if('wakeLock' in navigator){
+    try{
+      await navigator.wakeLock.request('screen');
+    }catch(e){}
+  }
+}
+preventScreenLock();
+document.addEventListener('click', preventScreenLock, {once:true});
+
+</script>
+</body>
+</html>
