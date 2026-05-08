@@ -23,6 +23,7 @@
   --accent-bg:#EAE9F7;
   --accent-bg2:#D8D6F0;
   --danger:#B91C1C;
+  --danger-soft:#DC2626;
   --success:#0E7C5A;
 }
 html, body{
@@ -103,7 +104,7 @@ body{
   flex-direction:column;
   gap:1vh;
   cursor:pointer;
-  transition:all 0.15s;
+  transition:background 0.2s, border-color 0.2s, transform 0.1s;
   position:relative;
   min-height:0;
   overflow:hidden;
@@ -115,20 +116,30 @@ body{
 .card:active{
   transform:scale(0.98);
 }
+/* ★ 방송 중인 카드 — 빨간색 중지 카드로 변환 */
 .card.playing{
-  background:var(--accent);
-  border-color:var(--accent);
-  cursor:wait;
+  background:var(--danger);
+  border-color:var(--danger);
+  cursor:pointer;
+  animation:pulse 1.5s ease-in-out infinite;
+}
+.card.playing:hover{background:var(--danger-soft);}
+@keyframes pulse{
+  0%, 100%{box-shadow:0 0 0 0 rgba(185, 28, 28, 0.4);}
+  50%{box-shadow:0 0 0 8px rgba(185, 28, 28, 0);}
 }
 .card.playing .card-title,
 .card.playing .card-time,
-.card.playing .card-action,
 .card.playing .info-btn{
   color:#FFFFFF;
 }
 .card.playing .info-btn{
   background:rgba(255,255,255,0.15);
   border-color:rgba(255,255,255,0.3);
+}
+.card.playing .card-action{
+  background:#FFFFFF;
+  color:var(--danger);
 }
 .card.disabled{
   opacity:0.4;
@@ -202,6 +213,7 @@ body{
   font-weight:600;
   letter-spacing:-0.01em;
   flex-shrink:0;
+  transition:background 0.2s;
 }
 .card-action-icon{
   font-size:clamp(14px, 2.2vh, 18px);
@@ -418,9 +430,6 @@ body{
 <div class="toast" id="toast"></div>
 
 <script>
-/* ══════════════════════════════════════════
-   ★ 안내방송 데이터 — 새 방송 추가 시 이 배열에만 항목 추가
-══════════════════════════════════════════ */
 const ANNOUNCEMENTS = [
   {
     id: 'lastorder',
@@ -451,12 +460,6 @@ const ANNOUNCEMENTS = [
 const CHIME_AUDIO = 'audio/chime.mp3';
 const TRIM_CHIME = 200;
 const TRIM_MESSAGE = 0;
-
-/* ══════════════════════════════════════════
-   ★ 음량 설정 (주차 방송과 통일)
-   - GAIN_GLOBAL: 1.65
-   - GAIN_BOOST: 멘트 전체는 균일한 음량이라 개별 부스트 불필요
-══════════════════════════════════════════ */
 const GAIN_GLOBAL = 1.65;
 const GAIN_BOOST = {};
 
@@ -472,6 +475,15 @@ let isPlaying = false;
 let audioBuffers = {};
 let audioContext = null;
 let currentModalId = null;
+let currentPlayingId = null;
+
+/* ══════════════════════════════════════════
+   ★ 중지 기능을 위한 상태 변수
+══════════════════════════════════════════ */
+let currentSource = null;
+let currentTrimTimer = null;
+let currentReject = null;
+let isStopped = false;
 
 async function initAudioContext(){
   if(audioContext) return;
@@ -500,7 +512,7 @@ function renderCards(){
   area.style.setProperty('--cols', cols);
   
   area.innerHTML = ANNOUNCEMENTS.map(a => `
-    <div class="card" id="card-${a.id}" onclick="playAnnouncement('${a.id}', event)">
+    <div class="card" id="card-${a.id}" onclick="onCardClick('${a.id}', event)">
       <div class="card-header">
         <div class="card-title">${a.title}</div>
         <button class="info-btn" onclick="openModal('${a.id}', event)" aria-label="${a.title} 전문 보기">i</button>
@@ -513,6 +525,24 @@ function renderCards(){
       </div>
     </div>
   `).join('');
+}
+
+/* ══════════════════════════════════════════
+   ★ 카드 클릭 핸들러 — 시작/중지 통합
+══════════════════════════════════════════ */
+function onCardClick(id, e){
+  if(e) e.stopPropagation();
+  
+  // 재생 중인 카드를 다시 누르면 중지
+  if(isPlaying && currentPlayingId === id){
+    stopBroadcast();
+    return;
+  }
+  
+  // 다른 카드는 재생 중에 누를 수 없음 (이미 disabled 처리됨)
+  if(isPlaying) return;
+  
+  playAnnouncement(id);
 }
 
 function openModal(id, e){
@@ -554,8 +584,7 @@ function playFromModal(){
   setTimeout(() => playAnnouncement(id), 100);
 }
 
-async function playAnnouncement(id, e){
-  if(e) e.stopPropagation();
+async function playAnnouncement(id){
   if(isPlaying) return;
   
   const a = ANNOUNCEMENTS.find(x => x.id === id);
@@ -566,23 +595,61 @@ async function playAnnouncement(id, e){
   }
   
   isPlaying = true;
+  isStopped = false;
+  currentPlayingId = id;
   setPlayingUI(id, true);
   
   try{
     await playAudioTrimmed(CHIME_AUDIO, TRIM_CHIME);
+    if(isStopped) throw new Error('STOPPED');
+    
     await playAudioTrimmed(a.audio, TRIM_MESSAGE);
     
     showToast('방송 완료');
     
     setTimeout(() => {
       isPlaying = false;
+      currentPlayingId = null;
       setPlayingUI(id, false);
     }, 600);
     
   }catch(err){
-    showToast('⚠ 재생 실패: ' + err.message);
+    if(err.message === 'STOPPED'){
+      showToast('방송 중지됨');
+    } else {
+      showToast('⚠ 재생 실패: ' + err.message);
+    }
     isPlaying = false;
+    currentPlayingId = null;
     setPlayingUI(id, false);
+  }
+}
+
+/* ══════════════════════════════════════════
+   ★ 방송 중지 — 즉시 음원 끊기
+══════════════════════════════════════════ */
+function stopBroadcast(){
+  if(!isPlaying) return;
+  
+  isStopped = true;
+  
+  if(currentSource){
+    try{
+      currentSource.stop(0);
+      currentSource.disconnect();
+    }catch(e){/* 이미 정지된 경우 무시 */}
+    currentSource = null;
+  }
+  
+  if(currentTrimTimer){
+    clearTimeout(currentTrimTimer);
+    currentTrimTimer = null;
+  }
+  
+  if(currentReject){
+    const reject = currentReject;
+    currentReject = null;
+    reject(new Error('STOPPED'));
   }
 }
 
@@ -593,11 +660,13 @@ function setPlayingUI(activeId, playing){
     if(playing){
       if(cardId === activeId){
         card.classList.add('playing');
-        card.querySelector('.card-action-text').textContent = '방송 중...';
+        card.querySelector('.card-action-icon').textContent = '⏹';
+        card.querySelector('.card-action-text').textContent = '방송 중지';
       } else {
         card.classList.add('disabled');
       }
     } else {
+      card.querySelector('.card-action-icon').textContent = '📢';
       card.querySelector('.card-action-text').textContent = '방송 시작';
     }
   });
@@ -605,6 +674,11 @@ function setPlayingUI(activeId, playing){
 
 function playAudioTrimmed(path, trimMs){
   return new Promise((resolve, reject) => {
+    if(isStopped){
+      reject(new Error('STOPPED'));
+      return;
+    }
+    
     const buffer = audioBuffers[path];
     if(!buffer || !audioContext){
       reject(new Error('음원을 찾을 수 없음: ' + path));
@@ -621,13 +695,20 @@ function playAudioTrimmed(path, trimMs){
     source.connect(gainNode);
     gainNode.connect(audioContext.destination);
     
+    currentSource = source;
+    currentReject = reject;
+    
     let resolved = false;
-    let trimTimer = null;
     
     const finish = () => {
       if(resolved) return;
       resolved = true;
-      if(trimTimer) clearTimeout(trimTimer);
+      if(currentTrimTimer){
+        clearTimeout(currentTrimTimer);
+        currentTrimTimer = null;
+      }
+      if(currentSource === source) currentSource = null;
+      if(currentReject === reject) currentReject = null;
       resolve();
     };
     
@@ -636,6 +717,8 @@ function playAudioTrimmed(path, trimMs){
     try{
       source.start(0);
     }catch(err){
+      if(currentReject === reject) currentReject = null;
+      if(currentSource === source) currentSource = null;
       reject(new Error('재생 시작 실패: ' + err.message));
       return;
     }
@@ -643,7 +726,7 @@ function playAudioTrimmed(path, trimMs){
     if(trimMs > 0){
       const durMs = buffer.duration * 1000;
       const trigger = Math.max(0, durMs - trimMs);
-      trimTimer = setTimeout(finish, trigger);
+      currentTrimTimer = setTimeout(finish, trigger);
     }
   });
 }
@@ -656,7 +739,14 @@ function showToast(msg){
 }
 
 document.addEventListener('keydown', (e) => {
-  if(isPlaying) return;
+  // 방송 중에 Esc 키로 중지 가능
+  if(isPlaying){
+    if(e.key === 'Escape'){
+      stopBroadcast();
+    }
+    return;
+  }
+  
   if(e.key >= '1' && e.key <= '9'){
     const idx = parseInt(e.key) - 1;
     if(idx < ANNOUNCEMENTS.length){
