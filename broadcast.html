@@ -23,6 +23,7 @@
   --accent-bg:#EAE9F7;
   --accent-bg2:#D8D6F0;
   --danger:#B91C1C;
+  --danger-soft:#DC2626;
   --success:#0E7C5A;
 }
 html, body{
@@ -199,7 +200,7 @@ body{
   justify-content:center;
   gap:8px;
   flex-shrink:0;
-  transition:all 0.15s;
+  transition:background 0.2s, transform 0.1s;
 }
 .broadcast-btn:hover{background:var(--accent-soft);}
 .broadcast-btn:active{transform:scale(0.98);}
@@ -209,9 +210,16 @@ body{
   opacity:0.6;
   transform:none;
 }
+/* ★ 방송 중일 때 — 빨간색 중지 버튼으로 변환 */
 .broadcast-btn.playing{
-  background:var(--success);
-  cursor:wait;
+  background:var(--danger);
+  cursor:pointer;
+  animation:pulse 1.5s ease-in-out infinite;
+}
+.broadcast-btn.playing:hover{background:var(--danger-soft);}
+@keyframes pulse{
+  0%, 100%{box-shadow:0 0 0 0 rgba(185, 28, 28, 0.4);}
+  50%{box-shadow:0 0 0 8px rgba(185, 28, 28, 0);}
 }
 .broadcast-icon{
   font-size:clamp(18px, 3vh, 26px);
@@ -344,8 +352,8 @@ body{
       </div>
     </div>
 
-    <button class="broadcast-btn" id="broadcast-btn" disabled onclick="startBroadcast()">
-      <span class="broadcast-icon">📢</span>
+    <button class="broadcast-btn" id="broadcast-btn" disabled onclick="onBroadcastBtnClick()">
+      <span class="broadcast-icon" id="broadcast-icon">📢</span>
       <span id="broadcast-btn-text">방송 시작</span>
     </button>
 
@@ -384,18 +392,12 @@ const TRIM_LAST_DIGIT = 200;
 const TRIM_LAST_DIGIT_FIRST_GROUP = 100;
 const TRIM_OUTRO = 0;
 
-/* ══════════════════════════════════════════
-   ★ 음량 증폭 설정
-   - GAIN_GLOBAL: 1.65 (전체 음량)
-   - GAIN_BOOST: 0/2/5/9는 추가 1.3배 → 최종 2.145배
-══════════════════════════════════════════ */
 const GAIN_GLOBAL = 1.65;
-
 const GAIN_BOOST = {
-  '0': 1.3,  // "영"
-  '2': 1.3,  // "이"
-  '5': 1.3,  // "오"
-  '9': 1.3,  // "구"
+  '0': 1.3,
+  '2': 1.3,
+  '5': 1.3,
+  '9': 1.3,
 };
 
 const AUDIO = {
@@ -418,6 +420,18 @@ let plateDigits = ['', '', '', ''];
 let isPlaying = false;
 let audioBuffers = {};
 let audioContext = null;
+
+/* ══════════════════════════════════════════
+   ★ 중지 기능을 위한 상태 변수
+   - currentSource: 현재 재생 중인 AudioBufferSourceNode
+   - currentTrimTimer: 현재 진행 중인 trim 타이머
+   - currentReject: 현재 재생 Promise의 reject 함수 (중지 시 호출)
+   - isStopped: 사용자가 중지를 요청했는지 여부 (재생 시퀀스 조기 종료용)
+══════════════════════════════════════════ */
+let currentSource = null;
+let currentTrimTimer = null;
+let currentReject = null;
+let isStopped = false;
 
 async function initAudioContext(){
   if(audioContext) return;
@@ -499,7 +513,21 @@ function renderPlate(){
 function updateBroadcastBtn(){
   const btn = document.getElementById('broadcast-btn');
   const allFilled = plateDigits.every(d => d !== '');
-  btn.disabled = !allFilled || isPlaying;
+  // 재생 중이 아닐 때만 disabled 갱신
+  if(!isPlaying){
+    btn.disabled = !allFilled;
+  }
+}
+
+/* ══════════════════════════════════════════
+   ★ 버튼 클릭 핸들러 — 시작/중지 통합
+══════════════════════════════════════════ */
+function onBroadcastBtnClick(){
+  if(isPlaying){
+    stopBroadcast();
+  } else {
+    startBroadcast();
+  }
 }
 
 async function startBroadcast(){
@@ -511,17 +539,24 @@ async function startBroadcast(){
   }
   
   isPlaying = true;
+  isStopped = false;
   updatePlayingUI(true);
   
   try{
     await playAudioTrimmed('chime', TRIM_CHIME);
+    if(isStopped) throw new Error('STOPPED');
+    
     await playAudioTrimmed('intro', TRIM_INTRO);
+    if(isStopped) throw new Error('STOPPED');
     
     if(REPEAT_NUMBERS){
       await playDigits(true);
+      if(isStopped) throw new Error('STOPPED');
       await playDigits(false);
+      if(isStopped) throw new Error('STOPPED');
     } else {
       await playDigits(false);
+      if(isStopped) throw new Error('STOPPED');
     }
     
     await playAudioTrimmed('outro', TRIM_OUTRO);
@@ -537,15 +572,54 @@ async function startBroadcast(){
     }, 800);
     
   }catch(e){
-    showToast('⚠ 재생 실패: ' + e.message);
+    if(e.message === 'STOPPED'){
+      // 사용자가 중지함 — 차량번호 초기화
+      plateDigits = ['', '', '', ''];
+      renderPlate();
+      showToast('방송 중지됨');
+    } else {
+      showToast('⚠ 재생 실패: ' + e.message);
+    }
     isPlaying = false;
     updatePlayingUI(false);
     updateBroadcastBtn();
   }
 }
 
+/* ══════════════════════════════════════════
+   ★ 방송 중지 — 즉시 음원 끊기
+══════════════════════════════════════════ */
+function stopBroadcast(){
+  if(!isPlaying) return;
+  
+  isStopped = true;
+  
+  // 현재 재생 중인 음원 즉시 정지
+  if(currentSource){
+    try{
+      currentSource.stop(0);
+      currentSource.disconnect();
+    }catch(e){/* 이미 정지된 경우 무시 */}
+    currentSource = null;
+  }
+  
+  // trim 타이머 취소
+  if(currentTrimTimer){
+    clearTimeout(currentTrimTimer);
+    currentTrimTimer = null;
+  }
+  
+  // 현재 Promise를 강제 reject (재생 시퀀스 중단)
+  if(currentReject){
+    const reject = currentReject;
+    currentReject = null;
+    reject(new Error('STOPPED'));
+  }
+}
+
 async function playDigits(isFirstGroup){
   for(let i = 0; i < plateDigits.length; i++){
+    if(isStopped) return;
     const isLast = (i === plateDigits.length - 1);
     let trim;
     if(isLast){
@@ -559,6 +633,11 @@ async function playDigits(isFirstGroup){
 
 function playAudioTrimmed(key, trimMs){
   return new Promise((resolve, reject) => {
+    if(isStopped){
+      reject(new Error('STOPPED'));
+      return;
+    }
+    
     const buffer = audioBuffers[key];
     if(!buffer || !audioContext){
       reject(new Error('음원을 찾을 수 없음: ' + key));
@@ -575,13 +654,21 @@ function playAudioTrimmed(key, trimMs){
     source.connect(gainNode);
     gainNode.connect(audioContext.destination);
     
+    // 현재 재생 정보 저장 (중지 함수에서 사용)
+    currentSource = source;
+    currentReject = reject;
+    
     let resolved = false;
-    let trimTimer = null;
     
     const finish = () => {
       if(resolved) return;
       resolved = true;
-      if(trimTimer) clearTimeout(trimTimer);
+      if(currentTrimTimer){
+        clearTimeout(currentTrimTimer);
+        currentTrimTimer = null;
+      }
+      if(currentSource === source) currentSource = null;
+      if(currentReject === reject) currentReject = null;
       resolve();
     };
     
@@ -590,6 +677,8 @@ function playAudioTrimmed(key, trimMs){
     try{
       source.start(0);
     }catch(err){
+      if(currentReject === reject) currentReject = null;
+      if(currentSource === source) currentSource = null;
       reject(new Error('재생 시작 실패: ' + err.message));
       return;
     }
@@ -597,7 +686,7 @@ function playAudioTrimmed(key, trimMs){
     if(trimMs > 0){
       const durMs = buffer.duration * 1000;
       const trigger = Math.max(0, durMs - trimMs);
-      trimTimer = setTimeout(finish, trigger);
+      currentTrimTimer = setTimeout(finish, trigger);
     }
   });
 }
@@ -605,16 +694,19 @@ function playAudioTrimmed(key, trimMs){
 function updatePlayingUI(playing){
   const btn = document.getElementById('broadcast-btn');
   const text = document.getElementById('broadcast-btn-text');
+  const icon = document.getElementById('broadcast-icon');
   const keypad = document.getElementById('keypad');
   
   if(playing){
     btn.classList.add('playing');
-    btn.disabled = true;
-    text.textContent = '방송 중...';
+    btn.disabled = false; // ★ 중지를 위해 활성 상태 유지
+    text.textContent = '방송 중지';
+    icon.textContent = '⏹';
     keypad.querySelectorAll('button').forEach(b => b.disabled = true);
   } else {
     btn.classList.remove('playing');
     text.textContent = '방송 시작';
+    icon.textContent = '📢';
     keypad.querySelectorAll('button').forEach(b => b.disabled = false);
   }
 }
@@ -627,7 +719,13 @@ function showToast(msg){
 }
 
 document.addEventListener('keydown', (e) => {
-  if(isPlaying) return;
+  // 방송 중에 Esc 키로 중지 가능 (PC 테스트 편의)
+  if(isPlaying){
+    if(e.key === 'Escape'){
+      stopBroadcast();
+    }
+    return;
+  }
   
   if(e.key >= '0' && e.key <= '9'){
     pressKey(e.key);
