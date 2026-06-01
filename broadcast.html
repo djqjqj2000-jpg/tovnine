@@ -9,22 +9,12 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
-  --bg:#FAFAFB;
-  --bg2:#F4F4F7;
-  --bg3:#EAEAEF;
-  --surface:#FFFFFF;
-  --border:#E5E5EB;
-  --border-strong:#D1D1DA;
-  --text:#15161B;
-  --text2:#5E6068;
-  --text3:#9B9DA5;
-  --accent:#3730A3;
-  --accent-soft:#4F46BA;
-  --accent-bg:#EAE9F7;
-  --accent-bg2:#D8D6F0;
-  --danger:#B91C1C;
-  --danger-soft:#DC2626;
-  --success:#0E7C5A;
+  --bg:#FAFAFB;--bg2:#F4F4F7;--bg3:#EAEAEF;
+  --surface:#FFFFFF;--border:#E5E5EB;--border-strong:#D1D1DA;
+  --text:#15161B;--text2:#5E6068;--text3:#9B9DA5;
+  --accent:#3730A3;--accent-soft:#4F46BA;
+  --accent-bg:#EAE9F7;--accent-bg2:#D8D6F0;
+  --danger:#B91C1C;--danger-soft:#DC2626;--success:#0E7C5A;
 }
 html, body{width:100%;height:100%;overflow:hidden;}
 body{
@@ -231,7 +221,14 @@ const TRIM_LAST_DIGIT = 200;
 const TRIM_LAST_DIGIT_FIRST_GROUP = 100;
 const TRIM_OUTRO = 0;
 
-const GAIN_GLOBAL = 3.0;
+/* ══════════════════════════════════════════
+   ★ 음량 + 컴프레서 강화 (v11)
+   - GAIN_GLOBAL: 3.0 → 5.0 (1.67배 증가)
+   - 컴프레서 threshold: -24dB → -30dB (더 적극적 압축)
+   - 컴프레서 ratio: 12 → 16 (압축 강도 증가)
+   - 결과: 평균 라우드니스 크게 증가, 클리핑은 여전히 차단
+══════════════════════════════════════════ */
+const GAIN_GLOBAL = 5.0;
 const GAIN_BOOST = {
   '0': 1.2,
   '2': 1.2,
@@ -239,8 +236,8 @@ const GAIN_BOOST = {
   '9': 1.2,
 };
 
-const COMPRESSOR_THRESHOLD = -24;
-const COMPRESSOR_RATIO = 12;
+const COMPRESSOR_THRESHOLD = -30;
+const COMPRESSOR_RATIO = 16;
 const COMPRESSOR_ATTACK = 0.003;
 const COMPRESSOR_RELEASE = 0.25;
 const COMPRESSOR_KNEE = 30;
@@ -265,17 +262,11 @@ let currentTrimTimer = null;
 let currentReject = null;
 let isStopped = false;
 
-/* ══════════════════════════════════════════
-   ★ AudioContext 초기화 — 컴프레서 분리
-   - AudioContext만 먼저 만들기 (음원 로드 가능 상태)
-   - 컴프레서는 첫 재생 시점에 lazy 생성
-══════════════════════════════════════════ */
 function initAudioContext(){
   if(audioContext) return;
   audioContext = new (window.AudioContext || window.webkitAudioContext)();
 }
 
-/* ★ 컴프레서를 안전하게 가져오는 함수 — lazy init */
 function getMasterCompressor(){
   if(!audioContext) return null;
   if(masterCompressor) return masterCompressor;
@@ -385,7 +376,6 @@ async function startBroadcast(){
     await audioContext.resume();
   }
   
-  // ★ 음원이 아직 로드 안 됐으면 지금 시도
   if(Object.keys(audioBuffers).length === 0){
     showToast('음원 로딩 중...');
     await preloadAudio();
@@ -489,7 +479,6 @@ function playAudioTrimmed(key, trimMs){
     
     source.connect(gainNode);
     
-    // ★ 컴프레서가 사용 가능하면 거치고, 아니면 직접 출력
     const compressor = getMasterCompressor();
     if(compressor){
       gainNode.connect(compressor);
@@ -581,7 +570,6 @@ document.addEventListener('touchstart', activateAudioOnFirstInteraction, {once:t
 
 renderPlate();
 updateBroadcastBtn();
-// 음원 로드는 페이지 진입 즉시 시도 (실패해도 첫 재생 시 다시 시도)
 preloadAudio();
 
 async function preventScreenLock(){
