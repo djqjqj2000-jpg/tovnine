@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>토브나인 주차 안내방송</title>
+<title>토브나인 주차 안내방송 (테스트)</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <style>
@@ -43,6 +43,15 @@ body{
   font-family:'JetBrains Mono',monospace;
   padding:0.8vh 1.2vw;background:var(--surface);
   border:1px solid var(--border);border-radius:8px;font-weight:600;
+}
+
+/* ★ 테스트 모드 표시 — 빨간 띠로 명확히 알림 */
+.test-banner{
+  background:#FEE4E4;border:1px solid #FCC5C5;
+  border-radius:8px;padding:0.6vh 1vw;
+  font-size:clamp(10px, 1.5vh, 13px);
+  color:var(--danger);font-weight:600;text-align:center;
+  flex-shrink:0;
 }
 
 .plate-section{
@@ -165,6 +174,8 @@ body{
       <div class="brand-badge">toV9</div>
     </div>
 
+    <div class="test-banner">⚠ 테스트 모드 — 음량 1/5 축소 (게인 1.0)</div>
+
     <div class="plate-section">
       <div class="section-label">차량번호 뒷자리 4자리</div>
       <div class="plate-grid" id="plate-grid">
@@ -222,19 +233,13 @@ const TRIM_LAST_DIGIT_FIRST_GROUP = 100;
 const TRIM_OUTRO = 0;
 
 /* ══════════════════════════════════════════
-   ★ 음량 + 컴프레서 강화 (v11)
-   - GAIN_GLOBAL: 3.0 → 5.0 (1.67배 증가)
-   - 컴프레서 threshold: -24dB → -30dB (더 적극적 압축)
-   - 컴프레서 ratio: 12 → 16 (압축 강도 증가)
-   - 결과: 평균 라우드니스 크게 증가, 클리핑은 여전히 차단
+   ★ 테스트 모드 — 게인 5.0 → 1.0 (1/5 축소)
+   - 적용 검증 목적의 임시 설정
+   - 부스트도 비활성화 (정확한 비교를 위해)
+   - 컴프레서는 그대로 두되 1.0 게인에서는 거의 작동 안 함
 ══════════════════════════════════════════ */
-const GAIN_GLOBAL = 5.0;
-const GAIN_BOOST = {
-  '0': 1.2,
-  '2': 1.2,
-  '5': 1.2,
-  '9': 1.2,
-};
+const GAIN_GLOBAL = 1.0;
+const GAIN_BOOST = {};
 
 const COMPRESSOR_THRESHOLD = -30;
 const COMPRESSOR_RATIO = 16;
@@ -307,6 +312,7 @@ async function preloadAudio(){
   });
   await Promise.all(promises);
   console.log('음원 로드 완료. 버퍼 개수:', Object.keys(audioBuffers).length);
+  console.log('★ 테스트 모드 활성 - 게인:', GAIN_GLOBAL);
 }
 
 function pressKey(digit){
