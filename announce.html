@@ -9,118 +9,57 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
-  --bg:#FAFAFB;
-  --bg2:#F4F4F7;
-  --bg3:#EAEAEF;
-  --surface:#FFFFFF;
-  --border:#E5E5EB;
-  --border-strong:#D1D1DA;
-  --text:#15161B;
-  --text2:#5E6068;
-  --text3:#9B9DA5;
-  --accent:#3730A3;
-  --accent-soft:#4F46BA;
-  --accent-bg:#EAE9F7;
-  --accent-bg2:#D8D6F0;
-  --danger:#B91C1C;
-  --danger-soft:#DC2626;
-  --success:#0E7C5A;
+  --bg:#FAFAFB;--bg2:#F4F4F7;--bg3:#EAEAEF;
+  --surface:#FFFFFF;--border:#E5E5EB;--border-strong:#D1D1DA;
+  --text:#15161B;--text2:#5E6068;--text3:#9B9DA5;
+  --accent:#3730A3;--accent-soft:#4F46BA;
+  --accent-bg:#EAE9F7;--accent-bg2:#D8D6F0;
+  --danger:#B91C1C;--danger-soft:#DC2626;--success:#0E7C5A;
 }
-html, body{
-  width:100%;
-  height:100%;
-  overflow:hidden;
-}
+html, body{width:100%;height:100%;overflow:hidden;}
 body{
   font-family:'Pretendard','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-  background:var(--bg2);
-  color:var(--text);
+  background:var(--bg2);color:var(--text);
   -webkit-tap-highlight-color:transparent;
   -webkit-font-smoothing:antialiased;
-  font-feature-settings:'tnum' 1;
-  letter-spacing:-0.01em;
-  user-select:none;
-  -webkit-user-select:none;
+  font-feature-settings:'tnum' 1;letter-spacing:-0.01em;
+  user-select:none;-webkit-user-select:none;
 }
 
 .app{
-  width:100vw;
-  height:100vh;
-  height:100dvh;
-  padding:1.5vh 1.5vw;
-  display:flex;
-  flex-direction:column;
-  gap:1.2vh;
-  overflow:hidden;
+  width:100vw;height:100vh;height:100dvh;
+  padding:1.5vh 1.5vw;display:flex;flex-direction:column;
+  gap:1.2vh;overflow:hidden;
 }
 
-.hdr{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  flex-shrink:0;
-  padding:0 0.5vw;
-}
-.hdr h1{
-  font-size:clamp(18px, 3.5vh, 32px);
-  font-weight:700;
-  color:var(--text);
-  letter-spacing:-0.04em;
-  line-height:1.2;
-}
-.hdr p{
-  font-size:clamp(10px, 1.5vh, 14px);
-  color:var(--text2);
-  margin-top:0.3vh;
-  font-family:'JetBrains Mono',monospace;
-}
+.hdr{display:flex;align-items:center;justify-content:space-between;flex-shrink:0;padding:0 0.5vw;}
+.hdr h1{font-size:clamp(18px, 3.5vh, 32px);font-weight:700;color:var(--text);letter-spacing:-0.04em;line-height:1.2;}
+.hdr p{font-size:clamp(10px, 1.5vh, 14px);color:var(--text2);margin-top:0.3vh;font-family:'JetBrains Mono',monospace;}
 .brand-badge{
-  font-size:clamp(10px, 1.5vh, 13px);
-  color:var(--text3);
+  font-size:clamp(10px, 1.5vh, 13px);color:var(--text3);
   font-family:'JetBrains Mono',monospace;
-  padding:0.8vh 1.2vw;
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:8px;
-  font-weight:600;
+  padding:0.8vh 1.2vw;background:var(--surface);
+  border:1px solid var(--border);border-radius:8px;font-weight:600;
 }
 
 .cards-area{
-  flex:1;
-  min-height:0;
-  display:grid;
+  flex:1;min-height:0;display:grid;
   grid-template-columns:repeat(var(--cols, 3), 1fr);
-  grid-auto-rows:1fr;
-  gap:1vw;
-  overflow:auto;
+  grid-auto-rows:1fr;gap:1vw;overflow:auto;
 }
 
 .card{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:14px;
-  padding:clamp(14px, 2.5vh, 24px);
-  display:flex;
-  flex-direction:column;
-  gap:1vh;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;padding:clamp(14px, 2.5vh, 24px);
+  display:flex;flex-direction:column;gap:1vh;
   cursor:pointer;
   transition:background 0.2s, border-color 0.2s, transform 0.1s;
-  position:relative;
-  min-height:0;
-  overflow:hidden;
+  position:relative;min-height:0;overflow:hidden;
 }
-.card:hover{
-  border-color:var(--accent-bg2);
-  background:var(--accent-bg);
-}
-.card:active{
-  transform:scale(0.98);
-}
-/* ★ 방송 중인 카드 — 빨간색 중지 카드로 변환 */
+.card:hover{border-color:var(--accent-bg2);background:var(--accent-bg);}
+.card:active{transform:scale(0.98);}
 .card.playing{
-  background:var(--danger);
-  border-color:var(--danger);
-  cursor:pointer;
+  background:var(--danger);border-color:var(--danger);cursor:pointer;
   animation:pulse 1.5s ease-in-out infinite;
 }
 .card.playing:hover{background:var(--danger-soft);}
@@ -128,270 +67,109 @@ body{
   0%, 100%{box-shadow:0 0 0 0 rgba(185, 28, 28, 0.4);}
   50%{box-shadow:0 0 0 8px rgba(185, 28, 28, 0);}
 }
-.card.playing .card-title,
-.card.playing .card-time,
-.card.playing .info-btn{
-  color:#FFFFFF;
-}
-.card.playing .info-btn{
-  background:rgba(255,255,255,0.15);
-  border-color:rgba(255,255,255,0.3);
-}
-.card.playing .card-action{
-  background:#FFFFFF;
-  color:var(--danger);
-}
-.card.disabled{
-  opacity:0.4;
-  pointer-events:none;
-}
+.card.playing .card-title,.card.playing .card-time,.card.playing .info-btn{color:#FFFFFF;}
+.card.playing .info-btn{background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.3);}
+.card.playing .card-action{background:#FFFFFF;color:var(--danger);}
+.card.disabled{opacity:0.4;pointer-events:none;}
 
-.card-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-  gap:8px;
-}
-.card-title{
-  font-size:clamp(18px, 3vh, 28px);
-  font-weight:700;
-  color:var(--text);
-  letter-spacing:-0.03em;
-  line-height:1.2;
-  flex:1;
-}
+.card-header{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+.card-title{font-size:clamp(18px, 3vh, 28px);font-weight:700;color:var(--text);letter-spacing:-0.03em;line-height:1.2;flex:1;}
 .info-btn{
-  width:clamp(28px, 4vh, 36px);
-  height:clamp(28px, 4vh, 36px);
-  border-radius:50%;
-  background:var(--bg2);
-  border:1px solid var(--border);
-  color:var(--text2);
-  font-size:clamp(13px, 2vh, 18px);
-  font-weight:600;
-  font-style:italic;
-  font-family:'Times New Roman',serif;
-  cursor:pointer;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  flex-shrink:0;
-  transition:all 0.15s;
+  width:clamp(28px, 4vh, 36px);height:clamp(28px, 4vh, 36px);
+  border-radius:50%;background:var(--bg2);border:1px solid var(--border);
+  color:var(--text2);font-size:clamp(13px, 2vh, 18px);
+  font-weight:600;font-style:italic;
+  font-family:'Times New Roman',serif;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:all 0.15s;
 }
-.info-btn:hover{
-  background:var(--accent-bg);
-  border-color:var(--accent);
-  color:var(--accent);
-}
-.info-btn:active{
-  transform:scale(0.92);
-}
+.info-btn:hover{background:var(--accent-bg);border-color:var(--accent);color:var(--accent);}
+.info-btn:active{transform:scale(0.92);}
 
 .card-time{
-  font-size:clamp(20px, 4vh, 38px);
-  font-weight:700;
-  color:var(--accent);
-  font-family:'JetBrains Mono',monospace;
-  letter-spacing:-0.02em;
-  line-height:1;
+  font-size:clamp(20px, 4vh, 38px);font-weight:700;color:var(--accent);
+  font-family:'JetBrains Mono',monospace;letter-spacing:-0.02em;line-height:1;
 }
-
-.card-spacer{
-  flex:1;
-}
-
+.card-spacer{flex:1;}
 .card-action{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  padding:clamp(10px, 1.8vh, 16px);
-  background:var(--accent);
-  color:#FFFFFF;
-  border-radius:10px;
-  font-size:clamp(13px, 2.2vh, 18px);
-  font-weight:600;
-  letter-spacing:-0.01em;
-  flex-shrink:0;
-  transition:background 0.2s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:clamp(10px, 1.8vh, 16px);background:var(--accent);color:#FFFFFF;
+  border-radius:10px;font-size:clamp(13px, 2.2vh, 18px);font-weight:600;
+  letter-spacing:-0.01em;flex-shrink:0;transition:background 0.2s;
 }
-.card-action-icon{
-  font-size:clamp(14px, 2.2vh, 18px);
-  line-height:1;
-}
+.card-action-icon{font-size:clamp(14px, 2.2vh, 18px);line-height:1;}
 
 .modal-overlay{
-  display:none;
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.5);
-  z-index:200;
-  align-items:center;
-  justify-content:center;
-  padding:3vh 3vw;
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;
+  align-items:center;justify-content:center;padding:3vh 3vw;
 }
-.modal-overlay.show{
-  display:flex;
-}
+.modal-overlay.show{display:flex;}
 .modal{
-  background:var(--surface);
-  border-radius:16px;
-  max-width:600px;
-  width:100%;
-  max-height:90vh;
-  overflow:hidden;
-  display:flex;
-  flex-direction:column;
+  background:var(--surface);border-radius:16px;
+  max-width:600px;width:100%;max-height:90vh;
+  overflow:hidden;display:flex;flex-direction:column;
   box-shadow:0 8px 30px rgba(0,0,0,0.15);
 }
-.modal-hdr{
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  padding:18px 20px;
-  border-bottom:1px solid var(--border);
-  gap:12px;
-}
+.modal-hdr{display:flex;align-items:flex-start;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border);gap:12px;}
 .modal-ttl-wrap{flex:1;}
-.modal-ttl{
-  font-size:18px;
-  font-weight:700;
-  color:var(--text);
-  letter-spacing:-0.03em;
-  line-height:1.3;
-}
-.modal-time{
-  font-size:13px;
-  color:var(--accent);
-  font-family:'JetBrains Mono',monospace;
-  font-weight:600;
-  margin-top:3px;
-}
+.modal-ttl{font-size:18px;font-weight:700;color:var(--text);letter-spacing:-0.03em;line-height:1.3;}
+.modal-time{font-size:13px;color:var(--accent);font-family:'JetBrains Mono',monospace;font-weight:600;margin-top:3px;}
 .close-x{
-  font-size:18px;
-  color:var(--text2);
-  cursor:pointer;
-  background:none;
-  border:none;
-  width:32px;
-  height:32px;
-  border-radius:8px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  flex-shrink:0;
-  transition:background 0.15s;
+  font-size:18px;color:var(--text2);cursor:pointer;background:none;border:none;
+  width:32px;height:32px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:background 0.15s;
 }
 .close-x:hover{background:var(--bg2);color:var(--text);}
-.modal-body{
-  padding:18px 20px;
-  flex:1;
-  overflow-y:auto;
-}
-.modal-section-label{
-  font-size:11px;
-  color:var(--text3);
-  font-weight:600;
-  text-transform:uppercase;
-  letter-spacing:0.05em;
-  margin-bottom:8px;
-}
+.modal-body{padding:18px 20px;flex:1;overflow-y:auto;}
+.modal-section-label{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;}
 .modal-text{
-  font-size:15px;
-  color:var(--text);
-  line-height:1.7;
-  font-weight:500;
-  background:var(--bg2);
-  border:1px solid var(--border);
-  border-radius:10px;
-  padding:14px 16px;
+  font-size:15px;color:var(--text);line-height:1.7;font-weight:500;
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:10px;padding:14px 16px;
 }
 .modal-text .highlight{
-  background:var(--accent-bg);
-  color:var(--accent);
-  font-weight:700;
-  padding:1px 6px;
-  border-radius:5px;
-  font-family:'JetBrains Mono',monospace;
+  background:var(--accent-bg);color:var(--accent);font-weight:700;
+  padding:1px 6px;border-radius:5px;font-family:'JetBrains Mono',monospace;
 }
-.modal-foot{
-  padding:14px 20px 18px;
-  border-top:1px solid var(--border);
-  background:var(--bg2);
-  display:flex;
-  gap:8px;
-}
+.modal-foot{padding:14px 20px 18px;border-top:1px solid var(--border);background:var(--bg2);display:flex;gap:8px;}
 .modal-btn-play{
-  flex:1;
-  font-family:inherit;
-  font-size:14px;
-  font-weight:700;
-  padding:13px;
-  background:var(--accent);
-  color:#FFFFFF;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:6px;
-  letter-spacing:-0.01em;
-  transition:background 0.15s;
+  flex:1;font-family:inherit;font-size:14px;font-weight:700;
+  padding:13px;background:var(--accent);color:#FFFFFF;border:none;
+  border-radius:10px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  letter-spacing:-0.01em;transition:background 0.15s;
 }
 .modal-btn-play:hover{background:var(--accent-soft);}
 .modal-btn-play:active{transform:scale(0.98);}
 .modal-btn-close{
-  font-family:inherit;
-  font-size:13px;
-  padding:13px 18px;
-  background:transparent;
-  color:var(--text2);
-  border:1px solid var(--border);
-  border-radius:10px;
-  cursor:pointer;
+  font-family:inherit;font-size:13px;padding:13px 18px;
+  background:transparent;color:var(--text2);
+  border:1px solid var(--border);border-radius:10px;cursor:pointer;
   transition:all 0.15s;
 }
-.modal-btn-close:hover{
-  background:var(--bg3);
-  color:var(--text);
-}
+.modal-btn-close:hover{background:var(--bg3);color:var(--text);}
 
 .toast{
-  position:fixed;
-  bottom:3vh;
-  left:50%;
+  position:fixed;bottom:3vh;left:50%;
   transform:translateX(-50%) translateY(20px);
-  background:#1a1a1a;
-  color:#FFFFFF;
+  background:#1a1a1a;color:#FFFFFF;
   font-size:clamp(12px, 2vh, 16px);
-  padding:1.2vh 2.5vw;
-  border-radius:28px;
-  opacity:0;
-  transition:all 0.25s;
-  pointer-events:none;
-  z-index:300;
-  white-space:nowrap;
-  font-family:inherit;
-  letter-spacing:-0.01em;
-  font-weight:500;
+  padding:1.2vh 2.5vw;border-radius:28px;
+  opacity:0;transition:all 0.25s;pointer-events:none;
+  z-index:300;white-space:nowrap;
+  font-family:inherit;letter-spacing:-0.01em;font-weight:500;
 }
-.toast.show{
-  opacity:1;
-  transform:translateX(-50%) translateY(0);
-}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
 @media (orientation:portrait){
-  .cards-area{
-    grid-template-columns:1fr;
-  }
+  .cards-area{grid-template-columns:1fr;}
 }
 </style>
 </head>
 <body>
 
 <div class="app">
-
   <div class="hdr">
     <div>
       <h1>매장 안내방송</h1>
@@ -399,9 +177,7 @@ body{
     </div>
     <div class="brand-badge">toV9</div>
   </div>
-
   <div class="cards-area" id="cards-area"></div>
-
 </div>
 
 <div class="modal-overlay" id="modal-overlay" onclick="bgClickModal(event)">
@@ -460,8 +236,15 @@ const ANNOUNCEMENTS = [
 const CHIME_AUDIO = 'audio/chime.mp3';
 const TRIM_CHIME = 200;
 const TRIM_MESSAGE = 0;
-const GAIN_GLOBAL = 1.65;
+
+const GAIN_GLOBAL = 3.0;
 const GAIN_BOOST = {};
+
+const COMPRESSOR_THRESHOLD = -24;
+const COMPRESSOR_RATIO = 12;
+const COMPRESSOR_ATTACK = 0.003;
+const COMPRESSOR_RELEASE = 0.25;
+const COMPRESSOR_KNEE = 30;
 
 function getGridCols(count){
   if(count <= 3) return count;
@@ -474,28 +257,56 @@ function getGridCols(count){
 let isPlaying = false;
 let audioBuffers = {};
 let audioContext = null;
+let masterCompressor = null;
 let currentModalId = null;
 let currentPlayingId = null;
 
-/* ══════════════════════════════════════════
-   ★ 중지 기능을 위한 상태 변수
-══════════════════════════════════════════ */
 let currentSource = null;
 let currentTrimTimer = null;
 let currentReject = null;
 let isStopped = false;
 
-async function initAudioContext(){
+/* ══════════════════════════════════════════
+   ★ AudioContext 초기화 - 컴프레서와 분리
+══════════════════════════════════════════ */
+function initAudioContext(){
   if(audioContext) return;
   audioContext = new (window.AudioContext || window.webkitAudioContext)();
 }
 
+/* ★ 컴프레서를 안전하게 가져오는 함수 — lazy init */
+function getMasterCompressor(){
+  if(!audioContext) return null;
+  if(masterCompressor) return masterCompressor;
+  
+  try{
+    masterCompressor = audioContext.createDynamicsCompressor();
+    masterCompressor.threshold.value = COMPRESSOR_THRESHOLD;
+    masterCompressor.ratio.value = COMPRESSOR_RATIO;
+    masterCompressor.attack.value = COMPRESSOR_ATTACK;
+    masterCompressor.release.value = COMPRESSOR_RELEASE;
+    masterCompressor.knee.value = COMPRESSOR_KNEE;
+    masterCompressor.connect(audioContext.destination);
+    return masterCompressor;
+  }catch(e){
+    console.warn('컴프레서 생성 실패, destination 직접 사용:', e);
+    masterCompressor = null;
+    return null;
+  }
+}
+
 async function preloadAudio(){
-  await initAudioContext();
+  initAudioContext();
+  if(!audioContext){
+    console.error('AudioContext 생성 실패');
+    return;
+  }
+  
   const allPaths = [CHIME_AUDIO, ...ANNOUNCEMENTS.map(a => a.audio)];
   const promises = allPaths.map(async (path) => {
     try{
       const res = await fetch(path);
+      if(!res.ok) throw new Error('HTTP ' + res.status);
       const arrayBuffer = await res.arrayBuffer();
       const buffer = await audioContext.decodeAudioData(arrayBuffer);
       audioBuffers[path] = buffer;
@@ -504,6 +315,7 @@ async function preloadAudio(){
     }
   });
   await Promise.all(promises);
+  console.log('음원 로드 완료. 버퍼 개수:', Object.keys(audioBuffers).length);
 }
 
 function renderCards(){
@@ -527,35 +339,21 @@ function renderCards(){
   `).join('');
 }
 
-/* ══════════════════════════════════════════
-   ★ 카드 클릭 핸들러 — 시작/중지 통합
-══════════════════════════════════════════ */
 function onCardClick(id, e){
   if(e) e.stopPropagation();
-  
-  // 재생 중인 카드를 다시 누르면 중지
-  if(isPlaying && currentPlayingId === id){
-    stopBroadcast();
-    return;
-  }
-  
-  // 다른 카드는 재생 중에 누를 수 없음 (이미 disabled 처리됨)
+  if(isPlaying && currentPlayingId === id){stopBroadcast(); return;}
   if(isPlaying) return;
-  
   playAnnouncement(id);
 }
 
 function openModal(id, e){
   if(e) e.stopPropagation();
   if(isPlaying) return;
-  
   const a = ANNOUNCEMENTS.find(x => x.id === id);
   if(!a) return;
-  
   currentModalId = id;
   document.getElementById('modal-ttl').textContent = a.title;
   document.getElementById('modal-time').textContent = a.time;
-  
   let highlightedText = a.text;
   if(a.highlights && a.highlights.length){
     a.highlights.forEach(kw => {
@@ -564,7 +362,6 @@ function openModal(id, e){
     });
   }
   document.getElementById('modal-text').innerHTML = highlightedText;
-  
   document.getElementById('modal-overlay').classList.add('show');
 }
 
@@ -586,12 +383,22 @@ function playFromModal(){
 
 async function playAnnouncement(id){
   if(isPlaying) return;
-  
   const a = ANNOUNCEMENTS.find(x => x.id === id);
   if(!a) return;
   
+  if(!audioContext){initAudioContext();}
   if(audioContext && audioContext.state === 'suspended'){
     await audioContext.resume();
+  }
+  
+  // ★ 음원이 아직 로드 안 됐으면 지금 시도
+  if(Object.keys(audioBuffers).length === 0){
+    showToast('음원 로딩 중...');
+    await preloadAudio();
+    if(Object.keys(audioBuffers).length === 0){
+      showToast('⚠ 음원 로드 실패. 새로고침 해주세요.');
+      return;
+    }
   }
   
   isPlaying = true;
@@ -602,11 +409,9 @@ async function playAnnouncement(id){
   try{
     await playAudioTrimmed(CHIME_AUDIO, TRIM_CHIME);
     if(isStopped) throw new Error('STOPPED');
-    
     await playAudioTrimmed(a.audio, TRIM_MESSAGE);
     
     showToast('방송 완료');
-    
     setTimeout(() => {
       isPlaying = false;
       currentPlayingId = null;
@@ -617,6 +422,7 @@ async function playAnnouncement(id){
     if(err.message === 'STOPPED'){
       showToast('방송 중지됨');
     } else {
+      console.error('재생 오류:', err);
       showToast('⚠ 재생 실패: ' + err.message);
     }
     isPlaying = false;
@@ -625,27 +431,14 @@ async function playAnnouncement(id){
   }
 }
 
-/* ══════════════════════════════════════════
-   ★ 방송 중지 — 즉시 음원 끊기
-══════════════════════════════════════════ */
 function stopBroadcast(){
   if(!isPlaying) return;
-  
   isStopped = true;
-  
   if(currentSource){
-    try{
-      currentSource.stop(0);
-      currentSource.disconnect();
-    }catch(e){/* 이미 정지된 경우 무시 */}
+    try{currentSource.stop(0); currentSource.disconnect();}catch(e){}
     currentSource = null;
   }
-  
-  if(currentTrimTimer){
-    clearTimeout(currentTrimTimer);
-    currentTrimTimer = null;
-  }
-  
+  if(currentTrimTimer){clearTimeout(currentTrimTimer); currentTrimTimer = null;}
   if(currentReject){
     const reject = currentReject;
     currentReject = null;
@@ -674,10 +467,7 @@ function setPlayingUI(activeId, playing){
 
 function playAudioTrimmed(path, trimMs){
   return new Promise((resolve, reject) => {
-    if(isStopped){
-      reject(new Error('STOPPED'));
-      return;
-    }
+    if(isStopped){reject(new Error('STOPPED')); return;}
     
     const buffer = audioBuffers[path];
     if(!buffer || !audioContext){
@@ -693,20 +483,23 @@ function playAudioTrimmed(path, trimMs){
     gainNode.gain.value = GAIN_GLOBAL * boost;
     
     source.connect(gainNode);
-    gainNode.connect(audioContext.destination);
+    
+    // ★ 컴프레서가 사용 가능하면 거치고, 아니면 직접 출력
+    const compressor = getMasterCompressor();
+    if(compressor){
+      gainNode.connect(compressor);
+    } else {
+      gainNode.connect(audioContext.destination);
+    }
     
     currentSource = source;
     currentReject = reject;
     
     let resolved = false;
-    
     const finish = () => {
       if(resolved) return;
       resolved = true;
-      if(currentTrimTimer){
-        clearTimeout(currentTrimTimer);
-        currentTrimTimer = null;
-      }
+      if(currentTrimTimer){clearTimeout(currentTrimTimer); currentTrimTimer = null;}
       if(currentSource === source) currentSource = null;
       if(currentReject === reject) currentReject = null;
       resolve();
@@ -739,32 +532,25 @@ function showToast(msg){
 }
 
 document.addEventListener('keydown', (e) => {
-  // 방송 중에 Esc 키로 중지 가능
   if(isPlaying){
-    if(e.key === 'Escape'){
-      stopBroadcast();
-    }
+    if(e.key === 'Escape'){stopBroadcast();}
     return;
   }
-  
   if(e.key >= '1' && e.key <= '9'){
     const idx = parseInt(e.key) - 1;
     if(idx < ANNOUNCEMENTS.length){
       playAnnouncement(ANNOUNCEMENTS[idx].id);
     }
   } else if(e.key === 'Escape'){
-    if(document.getElementById('modal-overlay').classList.contains('show')){
-      closeModal();
-    }
+    if(document.getElementById('modal-overlay').classList.contains('show')){closeModal();}
   }
 });
 
 function activateAudioOnFirstInteraction(){
-  initAudioContext().then(() => {
-    if(audioContext.state === 'suspended'){
-      audioContext.resume();
-    }
-  });
+  initAudioContext();
+  if(audioContext && audioContext.state === 'suspended'){
+    audioContext.resume();
+  }
 }
 document.addEventListener('click', activateAudioOnFirstInteraction, {once:true});
 document.addEventListener('touchstart', activateAudioOnFirstInteraction, {once:true});
@@ -774,9 +560,7 @@ preloadAudio();
 
 async function preventScreenLock(){
   if('wakeLock' in navigator){
-    try{
-      await navigator.wakeLock.request('screen');
-    }catch(e){}
+    try{await navigator.wakeLock.request('screen');}catch(e){}
   }
 }
 preventScreenLock();
