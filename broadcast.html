@@ -26,194 +26,90 @@
   --danger-soft:#DC2626;
   --success:#0E7C5A;
 }
-html, body{
-  width:100%;
-  height:100%;
-  overflow:hidden;
-}
+html, body{width:100%;height:100%;overflow:hidden;}
 body{
   font-family:'Pretendard','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-  background:var(--bg2);
-  color:var(--text);
+  background:var(--bg2);color:var(--text);
   -webkit-tap-highlight-color:transparent;
   -webkit-font-smoothing:antialiased;
-  font-feature-settings:'tnum' 1;
-  letter-spacing:-0.01em;
-  user-select:none;
-  -webkit-user-select:none;
+  font-feature-settings:'tnum' 1;letter-spacing:-0.01em;
+  user-select:none;-webkit-user-select:none;
 }
 
 .app{
-  width:100vw;
-  height:100vh;
-  height:100dvh;
+  width:100vw;height:100vh;height:100dvh;
   padding:1.5vh 1.5vw;
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:1.2vw;
-  overflow:hidden;
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:1.2vw;overflow:hidden;
 }
 
-.left-panel{
-  display:flex;
-  flex-direction:column;
-  gap:1.2vh;
-  min-height:0;
-  overflow:hidden;
-}
+.left-panel{display:flex;flex-direction:column;gap:1.2vh;min-height:0;overflow:hidden;}
 
-.hdr{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  flex-shrink:0;
-  padding:0 0.5vw;
-}
-.hdr h1{
-  font-size:clamp(18px, 3.5vh, 32px);
-  font-weight:700;
-  color:var(--text);
-  letter-spacing:-0.04em;
-  line-height:1.2;
-}
-.hdr p{
-  font-size:clamp(10px, 1.5vh, 14px);
-  color:var(--text2);
-  margin-top:0.3vh;
-  font-family:'JetBrains Mono',monospace;
-}
+.hdr{display:flex;align-items:center;justify-content:space-between;flex-shrink:0;padding:0 0.5vw;}
+.hdr h1{font-size:clamp(18px, 3.5vh, 32px);font-weight:700;color:var(--text);letter-spacing:-0.04em;line-height:1.2;}
+.hdr p{font-size:clamp(10px, 1.5vh, 14px);color:var(--text2);margin-top:0.3vh;font-family:'JetBrains Mono',monospace;}
 .brand-badge{
-  font-size:clamp(10px, 1.5vh, 13px);
-  color:var(--text3);
+  font-size:clamp(10px, 1.5vh, 13px);color:var(--text3);
   font-family:'JetBrains Mono',monospace;
-  padding:0.8vh 1.2vw;
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:8px;
-  font-weight:600;
+  padding:0.8vh 1.2vw;background:var(--surface);
+  border:1px solid var(--border);border-radius:8px;font-weight:600;
 }
 
 .plate-section{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:12px;
-  padding:1.5vh 1.5vw;
-  flex-shrink:0;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:1.5vh 1.5vw;flex-shrink:0;
 }
 .section-label{
-  font-size:clamp(9px, 1.3vh, 13px);
-  color:var(--text3);
-  font-weight:600;
-  text-transform:uppercase;
-  letter-spacing:0.05em;
-  margin-bottom:1vh;
-  text-align:center;
+  font-size:clamp(9px, 1.3vh, 13px);color:var(--text3);font-weight:600;
+  text-transform:uppercase;letter-spacing:0.05em;
+  margin-bottom:1vh;text-align:center;
 }
-.plate-grid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:0.8vw;
-}
+.plate-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.8vw;}
 .plate-cell{
   height:clamp(55px, 11vh, 110px);
-  background:var(--bg2);
-  color:var(--text3);
-  border:2px solid var(--border);
-  border-radius:12px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:clamp(36px, 8vh, 72px);
-  font-weight:700;
+  background:var(--bg2);color:var(--text3);
+  border:2px solid var(--border);border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:clamp(36px, 8vh, 72px);font-weight:700;
   font-family:'JetBrains Mono',monospace;
   transition:all 0.15s;
 }
-.plate-cell.filled{
-  background:var(--accent);
-  color:#FFFFFF;
-  border-color:var(--accent);
-}
-.plate-cell.next{
-  border-color:var(--accent);
-  border-style:dashed;
-  background:var(--accent-bg);
-}
+.plate-cell.filled{background:var(--accent);color:#FFFFFF;border-color:var(--accent);}
+.plate-cell.next{border-color:var(--accent);border-style:dashed;background:var(--accent-bg);}
 
 .preview-section{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:12px;
-  padding:1.5vh 1.5vw;
-  flex:1;
-  min-height:60px;
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:1.5vh 1.5vw;
+  flex:1;min-height:60px;display:flex;flex-direction:column;overflow:hidden;
 }
-.preview-section .section-label{
-  text-align:left;
-  margin-bottom:1vh;
-}
+.preview-section .section-label{text-align:left;margin-bottom:1vh;}
 .preview-text{
-  font-size:clamp(13px, 2.2vh, 22px);
-  color:var(--text);
-  line-height:1.6;
-  flex:1;
-  display:flex;
-  align-items:center;
-  font-weight:500;
-  overflow:hidden;
+  font-size:clamp(13px, 2.2vh, 22px);color:var(--text);
+  line-height:1.6;flex:1;display:flex;align-items:center;
+  font-weight:500;overflow:hidden;
 }
 .plate-inline{
-  background:var(--accent-bg);
-  color:var(--accent);
-  font-weight:700;
-  padding:0.3vh 0.8vw;
-  border-radius:8px;
-  font-family:'JetBrains Mono',monospace;
-  letter-spacing:0.15em;
-  white-space:nowrap;
-  display:inline-block;
-  vertical-align:middle;
+  background:var(--accent-bg);color:var(--accent);font-weight:700;
+  padding:0.3vh 0.8vw;border-radius:8px;
+  font-family:'JetBrains Mono',monospace;letter-spacing:0.15em;
+  white-space:nowrap;display:inline-block;vertical-align:middle;
   font-size:clamp(14px, 2.4vh, 24px);
 }
-.plate-inline.empty{
-  background:var(--bg3);
-  color:var(--text3);
-  letter-spacing:0.2em;
-}
+.plate-inline.empty{background:var(--bg3);color:var(--text3);letter-spacing:0.2em;}
 
 .broadcast-btn{
-  width:100%;
-  padding:clamp(14px, 2.5vh, 24px);
-  background:var(--accent);
-  color:#FFFFFF;
-  border:none;
-  border-radius:12px;
-  font-family:inherit;
-  font-size:clamp(15px, 2.5vh, 22px);
-  font-weight:700;
-  letter-spacing:-0.01em;
-  cursor:pointer;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  flex-shrink:0;
-  transition:background 0.2s, transform 0.1s;
+  width:100%;padding:clamp(14px, 2.5vh, 24px);
+  background:var(--accent);color:#FFFFFF;border:none;border-radius:12px;
+  font-family:inherit;font-size:clamp(15px, 2.5vh, 22px);font-weight:700;
+  letter-spacing:-0.01em;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  flex-shrink:0;transition:background 0.2s, transform 0.1s;
 }
 .broadcast-btn:hover{background:var(--accent-soft);}
 .broadcast-btn:active{transform:scale(0.98);}
-.broadcast-btn:disabled{
-  background:var(--text3);
-  cursor:not-allowed;
-  opacity:0.6;
-  transform:none;
-}
-/* ★ 방송 중일 때 — 빨간색 중지 버튼으로 변환 */
+.broadcast-btn:disabled{background:var(--text3);cursor:not-allowed;opacity:0.6;transform:none;}
 .broadcast-btn.playing{
-  background:var(--danger);
-  cursor:pointer;
+  background:var(--danger);cursor:pointer;
   animation:pulse 1.5s ease-in-out infinite;
 }
 .broadcast-btn.playing:hover{background:var(--danger-soft);}
@@ -221,103 +117,48 @@ body{
   0%, 100%{box-shadow:0 0 0 0 rgba(185, 28, 28, 0.4);}
   50%{box-shadow:0 0 0 8px rgba(185, 28, 28, 0);}
 }
-.broadcast-icon{
-  font-size:clamp(18px, 3vh, 26px);
-  line-height:1;
-}
+.broadcast-icon{font-size:clamp(18px, 3vh, 26px);line-height:1;}
 
 .right-panel{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:12px;
-  padding:1.2vh 1vw;
-  display:flex;
-  flex-direction:column;
-  min-height:0;
-  overflow:hidden;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:1.2vh 1vw;
+  display:flex;flex-direction:column;min-height:0;overflow:hidden;
 }
 .keypad{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  grid-template-rows:repeat(4,1fr);
-  gap:0.8vh;
-  flex:1;
-  min-height:0;
+  display:grid;grid-template-columns:repeat(3,1fr);
+  grid-template-rows:repeat(4,1fr);gap:0.8vh;
+  flex:1;min-height:0;
 }
 .key{
-  background:var(--bg2);
-  border:1px solid var(--border);
-  border-radius:12px;
+  background:var(--bg2);border:1px solid var(--border);border-radius:12px;
   font-family:'JetBrains Mono',monospace;
-  font-size:clamp(28px, 6vh, 56px);
-  font-weight:600;
-  color:var(--text);
-  cursor:pointer;
-  transition:all 0.1s;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  min-height:0;
-  padding:0;
+  font-size:clamp(28px, 6vh, 56px);font-weight:600;color:var(--text);
+  cursor:pointer;transition:all 0.1s;
+  display:flex;align-items:center;justify-content:center;
+  min-height:0;padding:0;
 }
-.key:hover{
-  background:var(--bg3);
-  border-color:var(--border-strong);
-}
-.key:active{
-  transform:scale(0.95);
-  background:var(--accent-bg);
-  border-color:var(--accent);
-}
-.key.action{
-  font-family:'Pretendard',sans-serif;
-  font-size:clamp(13px, 2.2vh, 20px);
-  font-weight:600;
-  color:var(--text2);
-}
+.key:hover{background:var(--bg3);border-color:var(--border-strong);}
+.key:active{transform:scale(0.95);background:var(--accent-bg);border-color:var(--accent);}
+.key.action{font-family:'Pretendard',sans-serif;font-size:clamp(13px, 2.2vh, 20px);font-weight:600;color:var(--text2);}
 .key.action.danger{color:var(--danger);}
-.key.action .key-icon{
-  font-size:clamp(20px, 4vh, 36px);
-  line-height:1;
-}
-.key:disabled{
-  opacity:0.4;
-  cursor:not-allowed;
-}
+.key.action .key-icon{font-size:clamp(20px, 4vh, 36px);line-height:1;}
+.key:disabled{opacity:0.4;cursor:not-allowed;}
 
 .toast{
-  position:fixed;
-  bottom:3vh;
-  left:50%;
+  position:fixed;bottom:3vh;left:50%;
   transform:translateX(-50%) translateY(20px);
-  background:#1a1a1a;
-  color:#FFFFFF;
+  background:#1a1a1a;color:#FFFFFF;
   font-size:clamp(12px, 2vh, 16px);
-  padding:1.2vh 2.5vw;
-  border-radius:28px;
-  opacity:0;
-  transition:all 0.25s;
-  pointer-events:none;
-  z-index:100;
-  white-space:nowrap;
-  font-family:inherit;
-  letter-spacing:-0.01em;
-  font-weight:500;
+  padding:1.2vh 2.5vw;border-radius:28px;
+  opacity:0;transition:all 0.25s;
+  pointer-events:none;z-index:100;white-space:nowrap;
+  font-family:inherit;letter-spacing:-0.01em;font-weight:500;
 }
-.toast.show{
-  opacity:1;
-  transform:translateX(-50%) translateY(0);
-}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
 @media (orientation:portrait){
-  .app{
-    grid-template-columns:1fr;
-    grid-template-rows:auto 1fr;
-  }
-  .plate-cell{
-    height:clamp(50px, 9vh, 90px);
-    font-size:clamp(32px, 6vh, 56px);
-  }
+  .app{grid-template-columns:1fr;grid-template-rows:auto 1fr;}
+  .plate-cell{height:clamp(50px, 9vh, 90px);font-size:clamp(32px, 6vh, 56px);}
 }
 </style>
 </head>
@@ -326,7 +167,6 @@ body{
 <div class="app">
 
   <div class="left-panel">
-    
     <div class="hdr">
       <div>
         <h1>주차 안내방송</h1>
@@ -356,7 +196,6 @@ body{
       <span class="broadcast-icon" id="broadcast-icon">📢</span>
       <span id="broadcast-btn-text">방송 시작</span>
     </button>
-
   </div>
 
   <div class="right-panel">
@@ -392,65 +231,91 @@ const TRIM_LAST_DIGIT = 200;
 const TRIM_LAST_DIGIT_FIRST_GROUP = 100;
 const TRIM_OUTRO = 0;
 
-const GAIN_GLOBAL = 1.65;
+const GAIN_GLOBAL = 3.0;
 const GAIN_BOOST = {
-  '0': 1.3,
-  '2': 1.3,
-  '5': 1.3,
-  '9': 1.3,
+  '0': 1.2,
+  '2': 1.2,
+  '5': 1.2,
+  '9': 1.2,
 };
+
+const COMPRESSOR_THRESHOLD = -24;
+const COMPRESSOR_RATIO = 12;
+const COMPRESSOR_ATTACK = 0.003;
+const COMPRESSOR_RELEASE = 0.25;
+const COMPRESSOR_KNEE = 30;
 
 const AUDIO = {
   chime: 'audio/chime.mp3',
   intro: 'audio/intro.mp3',
   outro: 'audio/outro.mp3',
-  '0': 'audio/0.mp3',
-  '1': 'audio/1.mp3',
-  '2': 'audio/2.mp3',
-  '3': 'audio/3.mp3',
-  '4': 'audio/4.mp3',
-  '5': 'audio/5.mp3',
-  '6': 'audio/6.mp3',
-  '7': 'audio/7.mp3',
-  '8': 'audio/8.mp3',
-  '9': 'audio/9.mp3',
+  '0': 'audio/0.mp3','1': 'audio/1.mp3','2': 'audio/2.mp3','3': 'audio/3.mp3',
+  '4': 'audio/4.mp3','5': 'audio/5.mp3','6': 'audio/6.mp3','7': 'audio/7.mp3',
+  '8': 'audio/8.mp3','9': 'audio/9.mp3',
 };
 
 let plateDigits = ['', '', '', ''];
 let isPlaying = false;
 let audioBuffers = {};
 let audioContext = null;
+let masterCompressor = null;
 
-/* ══════════════════════════════════════════
-   ★ 중지 기능을 위한 상태 변수
-   - currentSource: 현재 재생 중인 AudioBufferSourceNode
-   - currentTrimTimer: 현재 진행 중인 trim 타이머
-   - currentReject: 현재 재생 Promise의 reject 함수 (중지 시 호출)
-   - isStopped: 사용자가 중지를 요청했는지 여부 (재생 시퀀스 조기 종료용)
-══════════════════════════════════════════ */
 let currentSource = null;
 let currentTrimTimer = null;
 let currentReject = null;
 let isStopped = false;
 
-async function initAudioContext(){
+/* ══════════════════════════════════════════
+   ★ AudioContext 초기화 — 컴프레서 분리
+   - AudioContext만 먼저 만들기 (음원 로드 가능 상태)
+   - 컴프레서는 첫 재생 시점에 lazy 생성
+══════════════════════════════════════════ */
+function initAudioContext(){
   if(audioContext) return;
   audioContext = new (window.AudioContext || window.webkitAudioContext)();
 }
 
+/* ★ 컴프레서를 안전하게 가져오는 함수 — lazy init */
+function getMasterCompressor(){
+  if(!audioContext) return null;
+  if(masterCompressor) return masterCompressor;
+  
+  try{
+    masterCompressor = audioContext.createDynamicsCompressor();
+    masterCompressor.threshold.value = COMPRESSOR_THRESHOLD;
+    masterCompressor.ratio.value = COMPRESSOR_RATIO;
+    masterCompressor.attack.value = COMPRESSOR_ATTACK;
+    masterCompressor.release.value = COMPRESSOR_RELEASE;
+    masterCompressor.knee.value = COMPRESSOR_KNEE;
+    masterCompressor.connect(audioContext.destination);
+    return masterCompressor;
+  }catch(e){
+    console.warn('컴프레서 생성 실패, destination 직접 사용:', e);
+    masterCompressor = null;
+    return null;
+  }
+}
+
 async function preloadAudio(){
-  await initAudioContext();
+  initAudioContext();
+  if(!audioContext){
+    console.error('AudioContext 생성 실패');
+    return;
+  }
+  
   const promises = Object.entries(AUDIO).map(async ([key, path]) => {
     try{
       const res = await fetch(path);
+      if(!res.ok) throw new Error('HTTP ' + res.status);
       const arrayBuffer = await res.arrayBuffer();
       const buffer = await audioContext.decodeAudioData(arrayBuffer);
       audioBuffers[key] = buffer;
     }catch(e){
-      console.error('음원 로드 실패:', key, e);
+      console.error('음원 로드 실패:', key, path, e);
     }
   });
   await Promise.all(promises);
+  console.log('음원 로드 완료. 버퍼 개수:', Object.keys(audioBuffers).length);
 }
 
 function pressKey(digit){
@@ -468,10 +333,7 @@ function pressKey(digit){
 function pressBackspace(){
   if(isPlaying) return;
   for(let i = plateDigits.length - 1; i >= 0; i--){
-    if(plateDigits[i] !== ''){
-      plateDigits[i] = '';
-      break;
-    }
+    if(plateDigits[i] !== ''){plateDigits[i] = ''; break;}
   }
   renderPlate();
   updateBroadcastBtn();
@@ -487,25 +349,19 @@ function pressClear(){
 function renderPlate(){
   const cells = document.querySelectorAll('.plate-cell');
   const nextIdx = plateDigits.findIndex(d => d === '');
-  
   cells.forEach((cell, idx) => {
     cell.textContent = plateDigits[idx];
     cell.classList.remove('filled', 'next');
-    if(plateDigits[idx] !== ''){
-      cell.classList.add('filled');
-    } else if(idx === nextIdx){
-      cell.classList.add('next');
-    }
+    if(plateDigits[idx] !== ''){cell.classList.add('filled');}
+    else if(idx === nextIdx){cell.classList.add('next');}
   });
-  
   const inline = document.getElementById('plate-inline');
   const allFilled = plateDigits.every(d => d !== '');
   if(allFilled){
     inline.textContent = plateDigits.join(' ');
     inline.classList.remove('empty');
   } else {
-    const display = plateDigits.map(d => d === '' ? '_' : d).join(' ');
-    inline.textContent = display;
+    inline.textContent = plateDigits.map(d => d === '' ? '_' : d).join(' ');
     inline.classList.add('empty');
   }
 }
@@ -513,29 +369,30 @@ function renderPlate(){
 function updateBroadcastBtn(){
   const btn = document.getElementById('broadcast-btn');
   const allFilled = plateDigits.every(d => d !== '');
-  // 재생 중이 아닐 때만 disabled 갱신
-  if(!isPlaying){
-    btn.disabled = !allFilled;
-  }
+  if(!isPlaying){btn.disabled = !allFilled;}
 }
 
-/* ══════════════════════════════════════════
-   ★ 버튼 클릭 핸들러 — 시작/중지 통합
-══════════════════════════════════════════ */
 function onBroadcastBtnClick(){
-  if(isPlaying){
-    stopBroadcast();
-  } else {
-    startBroadcast();
-  }
+  if(isPlaying){stopBroadcast();} else {startBroadcast();}
 }
 
 async function startBroadcast(){
   if(isPlaying) return;
   if(plateDigits.some(d => d === '')) return;
   
+  if(!audioContext){initAudioContext();}
   if(audioContext && audioContext.state === 'suspended'){
     await audioContext.resume();
+  }
+  
+  // ★ 음원이 아직 로드 안 됐으면 지금 시도
+  if(Object.keys(audioBuffers).length === 0){
+    showToast('음원 로딩 중...');
+    await preloadAudio();
+    if(Object.keys(audioBuffers).length === 0){
+      showToast('⚠ 음원 로드 실패. 새로고침 해주세요.');
+      return;
+    }
   }
   
   isPlaying = true;
@@ -545,7 +402,6 @@ async function startBroadcast(){
   try{
     await playAudioTrimmed('chime', TRIM_CHIME);
     if(isStopped) throw new Error('STOPPED');
-    
     await playAudioTrimmed('intro', TRIM_INTRO);
     if(isStopped) throw new Error('STOPPED');
     
@@ -562,7 +418,6 @@ async function startBroadcast(){
     await playAudioTrimmed('outro', TRIM_OUTRO);
     
     showToast('방송 완료');
-    
     setTimeout(() => {
       plateDigits = ['', '', '', ''];
       renderPlate();
@@ -573,11 +428,11 @@ async function startBroadcast(){
     
   }catch(e){
     if(e.message === 'STOPPED'){
-      // 사용자가 중지함 — 차량번호 초기화
       plateDigits = ['', '', '', ''];
       renderPlate();
       showToast('방송 중지됨');
     } else {
+      console.error('재생 오류:', e);
       showToast('⚠ 재생 실패: ' + e.message);
     }
     isPlaying = false;
@@ -586,30 +441,14 @@ async function startBroadcast(){
   }
 }
 
-/* ══════════════════════════════════════════
-   ★ 방송 중지 — 즉시 음원 끊기
-══════════════════════════════════════════ */
 function stopBroadcast(){
   if(!isPlaying) return;
-  
   isStopped = true;
-  
-  // 현재 재생 중인 음원 즉시 정지
   if(currentSource){
-    try{
-      currentSource.stop(0);
-      currentSource.disconnect();
-    }catch(e){/* 이미 정지된 경우 무시 */}
+    try{currentSource.stop(0); currentSource.disconnect();}catch(e){}
     currentSource = null;
   }
-  
-  // trim 타이머 취소
-  if(currentTrimTimer){
-    clearTimeout(currentTrimTimer);
-    currentTrimTimer = null;
-  }
-  
-  // 현재 Promise를 강제 reject (재생 시퀀스 중단)
+  if(currentTrimTimer){clearTimeout(currentTrimTimer); currentTrimTimer = null;}
   if(currentReject){
     const reject = currentReject;
     currentReject = null;
@@ -633,10 +472,7 @@ async function playDigits(isFirstGroup){
 
 function playAudioTrimmed(key, trimMs){
   return new Promise((resolve, reject) => {
-    if(isStopped){
-      reject(new Error('STOPPED'));
-      return;
-    }
+    if(isStopped){reject(new Error('STOPPED')); return;}
     
     const buffer = audioBuffers[key];
     if(!buffer || !audioContext){
@@ -652,21 +488,23 @@ function playAudioTrimmed(key, trimMs){
     gainNode.gain.value = GAIN_GLOBAL * boost;
     
     source.connect(gainNode);
-    gainNode.connect(audioContext.destination);
     
-    // 현재 재생 정보 저장 (중지 함수에서 사용)
+    // ★ 컴프레서가 사용 가능하면 거치고, 아니면 직접 출력
+    const compressor = getMasterCompressor();
+    if(compressor){
+      gainNode.connect(compressor);
+    } else {
+      gainNode.connect(audioContext.destination);
+    }
+    
     currentSource = source;
     currentReject = reject;
     
     let resolved = false;
-    
     const finish = () => {
       if(resolved) return;
       resolved = true;
-      if(currentTrimTimer){
-        clearTimeout(currentTrimTimer);
-        currentTrimTimer = null;
-      }
+      if(currentTrimTimer){clearTimeout(currentTrimTimer); currentTrimTimer = null;}
       if(currentSource === source) currentSource = null;
       if(currentReject === reject) currentReject = null;
       resolve();
@@ -699,7 +537,7 @@ function updatePlayingUI(playing){
   
   if(playing){
     btn.classList.add('playing');
-    btn.disabled = false; // ★ 중지를 위해 활성 상태 유지
+    btn.disabled = false;
     text.textContent = '방송 중지';
     icon.textContent = '⏹';
     keypad.querySelectorAll('button').forEach(b => b.disabled = true);
@@ -719,45 +557,36 @@ function showToast(msg){
 }
 
 document.addEventListener('keydown', (e) => {
-  // 방송 중에 Esc 키로 중지 가능 (PC 테스트 편의)
   if(isPlaying){
-    if(e.key === 'Escape'){
-      stopBroadcast();
-    }
+    if(e.key === 'Escape'){stopBroadcast();}
     return;
   }
-  
-  if(e.key >= '0' && e.key <= '9'){
-    pressKey(e.key);
-  } else if(e.key === 'Backspace'){
-    pressBackspace();
-  } else if(e.key === 'Escape' || e.key === 'Delete'){
-    pressClear();
-  } else if(e.key === 'Enter'){
+  if(e.key >= '0' && e.key <= '9'){pressKey(e.key);}
+  else if(e.key === 'Backspace'){pressBackspace();}
+  else if(e.key === 'Escape' || e.key === 'Delete'){pressClear();}
+  else if(e.key === 'Enter'){
     const btn = document.getElementById('broadcast-btn');
     if(!btn.disabled) startBroadcast();
   }
 });
 
 function activateAudioOnFirstInteraction(){
-  initAudioContext().then(() => {
-    if(audioContext.state === 'suspended'){
-      audioContext.resume();
-    }
-  });
+  initAudioContext();
+  if(audioContext && audioContext.state === 'suspended'){
+    audioContext.resume();
+  }
 }
 document.addEventListener('click', activateAudioOnFirstInteraction, {once:true});
 document.addEventListener('touchstart', activateAudioOnFirstInteraction, {once:true});
 
-preloadAudio();
 renderPlate();
 updateBroadcastBtn();
+// 음원 로드는 페이지 진입 즉시 시도 (실패해도 첫 재생 시 다시 시도)
+preloadAudio();
 
 async function preventScreenLock(){
   if('wakeLock' in navigator){
-    try{
-      await navigator.wakeLock.request('screen');
-    }catch(e){}
+    try{await navigator.wakeLock.request('screen');}catch(e){}
   }
 }
 preventScreenLock();
