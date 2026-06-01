@@ -237,11 +237,16 @@ const CHIME_AUDIO = 'audio/chime.mp3';
 const TRIM_CHIME = 200;
 const TRIM_MESSAGE = 0;
 
-const GAIN_GLOBAL = 3.0;
+/* ══════════════════════════════════════════
+   ★ 음량 + 컴프레서 강화 (v5)
+   - GAIN_GLOBAL: 3.0 → 5.0
+   - 컴프레서 threshold/ratio 강화
+══════════════════════════════════════════ */
+const GAIN_GLOBAL = 5.0;
 const GAIN_BOOST = {};
 
-const COMPRESSOR_THRESHOLD = -24;
-const COMPRESSOR_RATIO = 12;
+const COMPRESSOR_THRESHOLD = -30;
+const COMPRESSOR_RATIO = 16;
 const COMPRESSOR_ATTACK = 0.003;
 const COMPRESSOR_RELEASE = 0.25;
 const COMPRESSOR_KNEE = 30;
@@ -266,15 +271,11 @@ let currentTrimTimer = null;
 let currentReject = null;
 let isStopped = false;
 
-/* ══════════════════════════════════════════
-   ★ AudioContext 초기화 - 컴프레서와 분리
-══════════════════════════════════════════ */
 function initAudioContext(){
   if(audioContext) return;
   audioContext = new (window.AudioContext || window.webkitAudioContext)();
 }
 
-/* ★ 컴프레서를 안전하게 가져오는 함수 — lazy init */
 function getMasterCompressor(){
   if(!audioContext) return null;
   if(masterCompressor) return masterCompressor;
@@ -391,7 +392,6 @@ async function playAnnouncement(id){
     await audioContext.resume();
   }
   
-  // ★ 음원이 아직 로드 안 됐으면 지금 시도
   if(Object.keys(audioBuffers).length === 0){
     showToast('음원 로딩 중...');
     await preloadAudio();
@@ -484,7 +484,6 @@ function playAudioTrimmed(path, trimMs){
     
     source.connect(gainNode);
     
-    // ★ 컴프레서가 사용 가능하면 거치고, 아니면 직접 출력
     const compressor = getMasterCompressor();
     if(compressor){
       gainNode.connect(compressor);
