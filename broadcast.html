@@ -45,7 +45,6 @@ body{
   border:1px solid var(--border);border-radius:8px;font-weight:600;
 }
 
-/* ★ 테스트 모드 표시 — 빨간 띠로 명확히 알림 */
 .test-banner{
   background:#FEE4E4;border:1px solid #FCC5C5;
   border-radius:8px;padding:0.6vh 1vw;
@@ -174,7 +173,7 @@ body{
       <div class="brand-badge">toV9</div>
     </div>
 
-    <div class="test-banner">⚠ 테스트 모드 — 음량 1/5 축소 (게인 1.0)</div>
+    <div class="test-banner">⚠ 테스트 모드 — 음량 1/5 (게인 0.2, 컴프레서 없음)</div>
 
     <div class="plate-section">
       <div class="section-label">차량번호 뒷자리 4자리</div>
@@ -233,19 +232,13 @@ const TRIM_LAST_DIGIT_FIRST_GROUP = 100;
 const TRIM_OUTRO = 0;
 
 /* ══════════════════════════════════════════
-   ★ 테스트 모드 — 게인 5.0 → 1.0 (1/5 축소)
-   - 적용 검증 목적의 임시 설정
-   - 부스트도 비활성화 (정확한 비교를 위해)
-   - 컴프레서는 그대로 두되 1.0 게인에서는 거의 작동 안 함
+   ★ 컴프레서 완전 제거 — 게인만 적용
+   ★ 테스트: 게인 0.2 (1/5 축소)
+   - 컴프레서가 게인을 흡수하지 않으므로 진짜 변화 검증 가능
+   - 이게 작아지면 코드 적용 정상 → 게인 키우면 됨
 ══════════════════════════════════════════ */
-const GAIN_GLOBAL = 1.0;
+const GAIN_GLOBAL = 0.2;
 const GAIN_BOOST = {};
-
-const COMPRESSOR_THRESHOLD = -30;
-const COMPRESSOR_RATIO = 16;
-const COMPRESSOR_ATTACK = 0.003;
-const COMPRESSOR_RELEASE = 0.25;
-const COMPRESSOR_KNEE = 30;
 
 const AUDIO = {
   chime: 'audio/chime.mp3',
@@ -260,7 +253,6 @@ let plateDigits = ['', '', '', ''];
 let isPlaying = false;
 let audioBuffers = {};
 let audioContext = null;
-let masterCompressor = null;
 
 let currentSource = null;
 let currentTrimTimer = null;
@@ -270,26 +262,6 @@ let isStopped = false;
 function initAudioContext(){
   if(audioContext) return;
   audioContext = new (window.AudioContext || window.webkitAudioContext)();
-}
-
-function getMasterCompressor(){
-  if(!audioContext) return null;
-  if(masterCompressor) return masterCompressor;
-  
-  try{
-    masterCompressor = audioContext.createDynamicsCompressor();
-    masterCompressor.threshold.value = COMPRESSOR_THRESHOLD;
-    masterCompressor.ratio.value = COMPRESSOR_RATIO;
-    masterCompressor.attack.value = COMPRESSOR_ATTACK;
-    masterCompressor.release.value = COMPRESSOR_RELEASE;
-    masterCompressor.knee.value = COMPRESSOR_KNEE;
-    masterCompressor.connect(audioContext.destination);
-    return masterCompressor;
-  }catch(e){
-    console.warn('컴프레서 생성 실패, destination 직접 사용:', e);
-    masterCompressor = null;
-    return null;
-  }
 }
 
 async function preloadAudio(){
@@ -312,7 +284,7 @@ async function preloadAudio(){
   });
   await Promise.all(promises);
   console.log('음원 로드 완료. 버퍼 개수:', Object.keys(audioBuffers).length);
-  console.log('★ 테스트 모드 활성 - 게인:', GAIN_GLOBAL);
+  console.log('★ 컴프레서 없음 / 게인:', GAIN_GLOBAL);
 }
 
 function pressKey(digit){
@@ -483,14 +455,9 @@ function playAudioTrimmed(key, trimMs){
     const boost = GAIN_BOOST[key] || 1.0;
     gainNode.gain.value = GAIN_GLOBAL * boost;
     
+    // ★ 컴프레서 완전 제거 — source → gain → 출력으로 직결
     source.connect(gainNode);
-    
-    const compressor = getMasterCompressor();
-    if(compressor){
-      gainNode.connect(compressor);
-    } else {
-      gainNode.connect(audioContext.destination);
-    }
+    gainNode.connect(audioContext.destination);
     
     currentSource = source;
     currentReject = reject;
