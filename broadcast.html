@@ -222,12 +222,18 @@ const TRIM_LAST_DIGIT_FIRST_GROUP = 100;
 const TRIM_OUTRO = 0;
 
 /* ══════════════════════════════════════════
-   ★ 음량 설정 (v14 - 컴프레서 없음)
-   - GAIN_GLOBAL: 3.0 (이전 1.65 대비 약 1.8배)
-   - 컴프레서 제거로 게인이 직접 출력에 반영됨
+   ★ 음량 설정 (최종 - 컴프레서 없음)
+   - GAIN_GLOBAL: 3.5 (전체 기본 게인)
+   - 0/2/5/9는 부스트 1.143배 적용 → 최종 4.0
+   - 원본 음원에서 0/2/5/9가 살짝 작아서 보정
 ══════════════════════════════════════════ */
-const GAIN_GLOBAL = 3.0;
-const GAIN_BOOST = {};
+const GAIN_GLOBAL = 3.5;
+const GAIN_BOOST = {
+  '0': 1.143,
+  '2': 1.143,
+  '5': 1.143,
+  '9': 1.143,
+};
 
 const AUDIO = {
   chime: 'audio/chime.mp3',
